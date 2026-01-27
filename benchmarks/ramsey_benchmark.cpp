@@ -97,21 +97,23 @@ public:
         return (double)mono_count;
     }
 
-    // Neighbors: Flip one edge color
+    // Neighbors: Flip random subset of edges
     std::vector<std::vector<int>> neighbors(const std::vector<int>& s) {
         std::vector<std::vector<int>> nbrs;
-        // For each edge, change to (c+1)%3 and (c+2)%3
-        // To save compute, maybe just random subset?
-        // With 66 edges * 2 alt colors = 132 neighbors. That's small enough to do all.
+        std::mt19937 rng(std::random_device{}());
+        std::uniform_int_distribution<int> edge_dist(0, num_edges - 1);
         
-        for(int i=0; i<num_edges; ++i) {
+        // Return random subset of neighbors for N=52 scale
+        // Full neighborhood is 2652 states. Evaluating all is too slow.
+        // Stochastic sampling is sufficient for high-dim landscapes.
+        for(int k=0; k<100; ++k) {
+            int i = edge_dist(rng);
             std::vector<int> n1 = s;
             n1[i] = (n1[i] + 1) % Colors;
             nbrs.push_back(n1);
 
-            std::vector<int> n2 = s;
-            n2[i] = (n2[i] + 2) % Colors;
-            nbrs.push_back(n2);
+            // Also try the other color? 
+            // Let's just do one random flip per neighbor to keep diversity
         }
         return nbrs;
     }
