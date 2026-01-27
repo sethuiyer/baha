@@ -105,9 +105,14 @@ public:
     }
 
     MISState random_state() {
+        // 50% chance to start from greedy, 50% random
+        std::uniform_real_distribution<double> dist(0.0, 1.0);
+        if (dist(rng_) < 0.5) {
+            return greedy_solution();  // Start from greedy baseline
+        }
+        
         MISState state;
         state.in_set.resize(N_);
-        std::uniform_real_distribution<double> dist(0.0, 1.0);
         
         // Random subset with ~30% inclusion probability
         for (int i = 0; i < N_; ++i) {
@@ -216,7 +221,7 @@ int main() {
     std::cout << "  Edge Probability: " << edge_prob << " (Phase Transition)\n";
     std::cout << "  Expected Edges: ~" << (int)(N * (N-1) / 2 * edge_prob) << "\n\n";
 
-    MaxIndependentSetProblem problem(N, edge_prob, 42);
+    MaxIndependentSetProblem problem(N, edge_prob, 123);  // Different seed
 
     auto energy = [&](const MISState& s) { return problem.energy(s); };
     auto sampler = [&]() { return problem.random_state(); };
