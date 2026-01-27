@@ -273,13 +273,15 @@ public:
                                   << ", score=" << best_branch.score << std::endl;
                     }
 
-                    // Jump to best branch - sample a good state there
-                    State jumped = sample_from_branch(best_branch.beta, config.samples_per_beta);
+                    // Jump to best branch - equilibrate from current state at the new beta
+                    State jumped = sample_from_branch(best_branch.beta, config.samples_per_beta, current);
                     double jumped_energy = energy_(jumped);
 
                     if (jumped_energy < best_energy) {
                         best = jumped;
                         best_energy = jumped_energy;
+                        current = jumped;
+                        current_energy = jumped_energy;
                         result.branch_jumps++;
 
                         if (config.verbose) {
@@ -389,37 +391,57 @@ private:
         return total_score / n_samples + 100.0 / (best_seen + 1.0);
     }
 
-    State sample_from_branch(double beta, int n_samples) {
-        State best = sampler_();
-        double best_energy = energy_(best);
-        for (int i = 0; i < n_samples; ++i) {
-            State s = sampler_();
-            double E = energy_(s);
-            // Accept with Boltzmann probability
-            if (E < best_energy) {
-                best = s;
-                best_energy = E;
-            }
-        }
-
-        // Local search from best sample
+    State sample_from_branch(double beta, int n_samples, const State& seed) {
+        State current = seed;
+        double current_energy = energy_(current);
+        
+        // Short MCMC equilibration at the target beta
         if (neighbors_) {
+            std::uniform_real_distribution<> unif(0, 1);
+            for (int i = 0; i < n_samples; ++i) {
+                auto nbrs = neighbors_(current);
+                if (nbrs.empty()) break;
+                
+                // Pick one random neighbor
+                int idx = std::uniform_int_distribution<>(0, nbrs.size()-1)(rng_);
+                const auto& nbr = nbrs[idx];
+                double nbr_energy = energy_(nbr);
+                
+                double delta = nbr_energy - current_energy;
+                if (delta <= 0 || unif(rng_) < std::exp(-beta * delta)) {
+                    current = nbr;
+                    current_energy = nbr_energy;
+                }
+            }
+            
+            // Greedily settle into the local minimum of this branch
             bool improved = true;
             while (improved) {
                 improved = false;
-                auto nbrs = neighbors_(best);
+                auto nbrs = neighbors_(current);
                 for (const auto& nbr : nbrs) {
                     double E = energy_(nbr);
-                    if (E < best_energy) {
-                        best = nbr;
-                        best_energy = E;
+                    if (E < current_energy) {
+                        current = nbr;
+                        current_energy = E;
                         improved = true;
                         break;
                     }
                 }
             }
+        } else {
+            // Fallback to random sampling if no neighbors
+            for (int i = 0; i < n_samples; ++i) {
+                State s = sampler_();
+                double E = energy_(s);
+                if (E < current_energy) {
+                    current = s;
+                    current_energy = E;
+                }
+            }
         }
-        return best;
+        
+        return current;
     }
 
     EnergyFn energy_;
