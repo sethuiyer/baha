@@ -4,6 +4,7 @@
 #include <random>
 #include <iomanip>
 #include <algorithm>
+#include <fstream>
 
 // External CUDA wrapper functions
 extern "C" {
@@ -129,6 +130,21 @@ int main() {
     std::cout << "\nRESULT:" << std::endl;
     std::cout << "Final Energy: " << result.best_energy << std::endl;
     problem.verify(result.best_state);
+
+    // Export witness CSV for verification
+    if (result.best_energy == 0) {
+        std::ofstream csv("data/ramsey_52_witness.csv");
+        csv << "edge_index,u,v,color\n";
+        int idx = 0;
+        for (int u = 0; u < 52; ++u) {
+            for (int v = u + 1; v < 52; ++v) {
+                csv << idx << "," << u << "," << v << "," << result.best_state[idx] << "\n";
+                idx++;
+            }
+        }
+        csv.close();
+        std::cout << "✅ Witness exported to data/ramsey_52_witness.csv\n";
+    }
 
     return 0;
 }
