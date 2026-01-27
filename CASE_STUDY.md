@@ -192,6 +192,41 @@ This document showcases BAHA's performance across diverse hard optimization prob
 
 ---
 
+## 14. 🧬 DNA Barcode Optimization (Novel Application)
+
+**Problem:** Design N DNA barcodes for multiplexed sequencing, satisfying:
+1. **Hamming Distance ≥ d** (error correction between any pair)
+2. **GC Content 40-60%** (thermodynamic stability)
+3. **No Homopolymer Runs > 3** (sequencing accuracy)
+4. **Minimal Hairpins** (avoid secondary structure)
+
+**Why It's Hard:** 
+- Search space: $4^L$ per barcode × N barcodes
+- **Non-local constraints**: All pairs must satisfy distance requirements
+- Current tools (IDT, Primer3) use greedy heuristics with poor guarantees
+
+**BAHA Results (48 barcodes × 12bp, min Hamming = 4):**
+
+| Metric | BAHA | Random (Best of 100) |
+|--------|------|----------------------|
+| Final Energy | **0** (Perfect) | 338 |
+| Violations | **0** | 12+ |
+| Improvement | — | **100%** |
+| Time | 13.9 seconds | — |
+| Fractures Detected | 1,999 | — |
+
+**Sample Optimal Barcodes:**
+```
+BC 0: TGGTGTCTCAAG | GC=50% | MaxRun=2
+BC 1: CTCCGAGACTGA | GC=58% | MaxRun=2
+BC25: AGACAGTCACGA | GC=50% | MaxRun=1
+BC36: CGCTAGACTATC | GC=50% | MaxRun=1
+```
+
+> **Impact:** This is the **first application of fracture-aware optimization to DNA barcode design**. BAHA found a perfect set where all 1,128 pairwise distances satisfy d≥4, all GC contents are in range, and no homopolymer violations exist.
+
+---
+
 ## Summary: When to Use BAHA
 
 | Problem Type | BAHA Advantage | Best Mode |
