@@ -227,6 +227,33 @@ BC36: CGCTAGACTATC | GC=50% | MaxRun=1
 
 ---
 
+## 15. ⚡ Maximum Independent Set (Karp's 21)
+
+**Problem:** Find the largest subset of vertices in a graph such that no two are adjacent.
+
+**Why It's Hard:**
+- **NP-Hard** — one of Karp's original 21 NP-complete problems
+- **APX-Hard** — cannot approximate within $|V|^{1-\epsilon}$ 
+- Degree-sorted greedy is a strong baseline for random graphs
+
+**BAHA Results (N=200, p=0.3, 5,949 edges):**
+
+| Method | Set Size | Valid | Notes |
+|--------|----------|-------|-------|
+| BAHA | 12 | ✅ | Fractures: ρ up to $10^{20}$ |
+| Greedy | **14** | ✅ | Degree-sorted heuristic |
+| Random (Best of 1000) | 6 | ✅ | — |
+
+**Key Observation:**
+> **Greedy wins on MIS** because it's a *specialized* algorithm exploiting the problem structure (low-degree vertices first). BAHA still **beats random by 2×**, but this is an honest case where domain-specific heuristics outperform general-purpose optimization.
+
+**When BAHA Would Win:**
+- Weighted MIS (greedy can't handle weights well)
+- MIS with additional constraints (scheduling, coloring)
+- Graphs with planted structure (fractures become exploitable)
+
+---
+
 ## Summary: When to Use BAHA
 
 | Problem Type | BAHA Advantage | Best Mode |
