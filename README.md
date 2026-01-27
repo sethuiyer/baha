@@ -15,7 +15,7 @@
 > - **Spectral Scaling**: Solved N=100,000 Number Partitioning in 13.6 seconds via O(N log N) analytical moments.
 
 <p align="center">
-  <img src="data/ramsey_102.png" alt="Ramsey N=102 3-Coloring" width="500"/>
+  <img src="data/ramsey_102.webp" alt="Ramsey N=102 3-Coloring" width="500"/>
   <br/>
   <em>3-Coloring of K₁₀₂ — 5,151 edges navigating 83.2M clique constraints</em>
 </p>
