@@ -2,17 +2,17 @@
   <img src="logo.png" alt="BAHA Logo" width="300"/>
 </p>
 
-# BAHA: Branch-Adaptive Hardness Aligner
+# BAHA: Branch-Aware Heuristic Annealing
 
-**The Fracture Hunter** - A next-generation optimization framework that detects and navigates structural discontinuities in optimization landscapes.
+A simulated annealing variant that uses phase transition detection (fractures) and Lambert-W branch enumeration to escape local minima.
 
 [![Watch the Presentation](https://img.shields.io/badge/YouTube-Watch%20Presentation-red?style=for-the-badge&logo=youtube)](https://www.youtube.com/watch?v=jVKetFO7SgM)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18373732.svg)](https://doi.org/10.5281/zenodo.18373732)
 
 > **🏆 Notable Results:**
-> - **R(5,5,5) @ N=52**: Perfect 3-coloring of K₅₂ (1,326 edges) with zero monochromatic K₅ — solved in <30 seconds on RTX 3050.
-> - **Scale Test @ N=102**: Handled 83.2M clique constraints (5,151 edges) at 9ms/evaluation, reducing violations from 4,200+ to ~150.
-> - **Spectral Scaling**: Solved N=100,000 Number Partitioning in 13.6 seconds via O(N log N) analytical moments.
+> - **R(5,5,5) @ N=52**: 3-coloring of K₅₂ with zero monochromatic K₅ — [verifiable witness](data/ramsey_52_witness.csv) solved in <1s (RTX 3050). Run `python data/verify_ramsey.py` to validate.
+> - **Scale Test @ N=102**: 83.2M clique constraints, reduced violations from 4,200+ to ~150 (not solved, demonstrates scaling).
+> - **Number Partitioning N=100k**: Found near-optimal partition in 13.6s using O(N) spectral moment computation for phase detection.
 
 <p align="center">
   <img src="data/ramsey_102.webp" alt="Ramsey N=102 3-Coloring" width="500"/>
@@ -22,24 +22,24 @@
 
 ## Overview
 
-BAHA (Branch-Aware Optimizer) is a revolutionary optimization algorithm that uses fracture detection (ρ = |d/dβ log Z|) and Lambert-W functions to identify and navigate solution basins in complex optimization landscapes. Unlike traditional simulated annealing, BAHA detects structural discontinuities ("fractures") and makes strategic jumps between solution branches.
+BAHA is a variant of simulated annealing that monitors the specific heat (ρ = |d/dβ log Z|) during the temperature schedule. When ρ spikes (indicating a phase transition), BAHA uses Lambert-W branch enumeration to select a new starting point, helping escape local minima. The optimizer is heuristic and provides no optimality guarantees.
 
 ## Technical Specification: B.A.H.A.
 
 **B.A.H.A.** — **Branch-Adaptive Hardness Aligner**
 
-1. **Branch-Adaptive**: Refers to the solver's ability to dynamically navigate the Riemann Surface of the optimization landscape. It utilizes the Lambert-W function to detect analytic fractures and autonomously transition between multi-valued sheets of the control parameter.
-2. **Hardness**: Specifically targets the NP-Hard complexity class and non-convex, rugged energy landscapes. It is optimized for problems where the solution space has "shattered" into isolated basins of attraction.
-3. **Analytic**: Signifies that the solver does not rely on stochastic sampling (Monte Carlo) to find the ground state. Instead, it computes the Spectral Specific Heat and Analytical Moments of the constraint system to perform exact state transitions.
-4. **Aligner**: Describes the mechanism of Adiabatic Recognition. Unlike a "Searcher" which wanders the space, the Aligner evolves the system's global invariants until the solution is the only state geometrically permissible.
+1. **Branch-Adaptive**: Uses Lambert-W function to enumerate alternative temperature branches when phase transitions are detected.
+2. **Hardness-Aware**: Designed for NP-hard combinatorial problems with rugged energy landscapes.
+3. **Hybrid Sampling**: Combines Metropolis MCMC with optional O(N) analytical moment computation for efficient phase detection.
+4. **Heuristic**: Like all annealing methods, provides good solutions quickly but no optimality guarantee.
 
 ## Key Features
 
-- **Fracture Detection**: Automatically identifies structural discontinuities in optimization landscapes
-- **Branch Navigation**: Uses Lambert-W functions to enumerate and navigate solution branches
-- **GPU Acceleration**: CUDA support for massive parallelization
-- **Spectral Analysis**: Analytical moment computation for O(N log N) scaling
-- **Phase Awareness**: Detects whether solutions exist in connected basins
+- **Fracture Detection**: Monitors specific heat to identify phase transitions
+- **Branch Navigation**: Uses Lambert-W functions to enumerate alternative restart points
+- **GPU Acceleration**: CUDA kernels for parallel constraint evaluation
+- **Spectral Analysis**: Optional O(N) analytical moments for partition-like problems
+- **Header-Only**: Single `baha.hpp` with no dependencies beyond C++17
 
 ## Installation
 
