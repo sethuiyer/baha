@@ -9,7 +9,10 @@
 [![Watch the Presentation](https://img.shields.io/badge/YouTube-Watch%20Presentation-red?style=for-the-badge&logo=youtube)](https://www.youtube.com/watch?v=jVKetFO7SgM)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18373732.svg)](https://doi.org/10.5281/zenodo.18373732)
 
-> **🏆 Notable Result:** Constructively proved **R(5,5,5) > 102** by 3-coloring K₁₀₂ (5,151 edges, 83.2M clique constraints) with **zero monochromatic K₅** in under 10 minutes on an RTX 3050.
+> **🏆 Notable Results:**
+> - **R(5,5,5) @ N=52**: Perfect 3-coloring of K₅₂ (1,326 edges) with zero monochromatic K₅ — solved in <30 seconds on RTX 3050.
+> - **Scale Test @ N=102**: Handled 83.2M clique constraints (5,151 edges) at 9ms/evaluation, reducing violations from 4,200+ to ~150.
+> - **Spectral Scaling**: Solved N=100,000 Number Partitioning in 13.6 seconds via O(N log N) analytical moments.
 
 ## Overview
 
