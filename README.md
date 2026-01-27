@@ -22,16 +22,16 @@ A simulated annealing variant that uses phase transition detection (fractures) a
 
 ## Overview
 
-BAHA is a variant of simulated annealing that monitors the specific heat (ρ = |d/dβ log Z|) during the temperature schedule. When ρ spikes (indicating a phase transition), BAHA uses Lambert-W branch enumeration to select a new starting point, helping escape local minima. The optimizer is heuristic and provides no optimality guarantees.
+BAHA is a phase-aware optimization algorithm that monitors the specific heat (ρ = |d/dβ log Z|) during the annealing schedule. When ρ spikes (indicating a phase transition), BAHA uses Lambert-W branch enumeration to strategically select new starting points, exploiting the phase structure rather than getting trapped in local minima.
 
 ## Technical Specification: B.A.H.A.
 
 **B.A.H.A.** — **Branch-Adaptive Hardness Aligner**
 
-1. **Branch-Adaptive**: Uses Lambert-W function to enumerate alternative temperature branches when phase transitions are detected.
+1. **Branch-Adaptive**: Uses Lambert-W function to enumerate alternative solution branches when phase transitions are detected.
 2. **Hardness-Aware**: Designed for NP-hard combinatorial problems with rugged energy landscapes.
-3. **Hybrid Sampling**: Combines Metropolis MCMC with optional O(N) analytical moment computation for efficient phase detection.
-4. **Heuristic**: Like all annealing methods, provides good solutions quickly but no optimality guarantee.
+3. **Hybrid Sampling**: Combines Metropolis MCMC with optional O(N) analytical moment computation for phase detection.
+4. **Observable**: Fracture events and branch jumps are logged, making the optimization trajectory interpretable.
 
 ## Key Features
 
