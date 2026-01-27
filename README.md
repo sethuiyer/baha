@@ -14,6 +14,12 @@
 > - **Scale Test @ N=102**: Handled 83.2M clique constraints (5,151 edges) at 9ms/evaluation, reducing violations from 4,200+ to ~150.
 > - **Spectral Scaling**: Solved N=100,000 Number Partitioning in 13.6 seconds via O(N log N) analytical moments.
 
+<p align="center">
+  <img src="data/ramsey_102.png" alt="Ramsey N=102 3-Coloring" width="500"/>
+  <br/>
+  <em>3-Coloring of K₁₀₂ — 5,151 edges navigating 83.2M clique constraints</em>
+</p>
+
 ## Overview
 
 BAHA (Branch-Aware Optimizer) is a revolutionary optimization algorithm that uses fracture detection (ρ = |d/dβ log Z|) and Lambert-W functions to identify and navigate solution basins in complex optimization landscapes. Unlike traditional simulated annealing, BAHA detects structural discontinuities ("fractures") and makes strategic jumps between solution branches.
