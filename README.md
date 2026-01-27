@@ -2,7 +2,7 @@
   <img src="logo.png" alt="BAHA Logo" width="300"/>
 </p>
 
-# BAHA: Branch-Aware Heuristic Annealing
+# BAHA: Branch-Aware Holonomy Annealing
 
 A simulated annealing variant that uses phase transition detection (fractures) and Lambert-W branch enumeration to escape local minima.
 
