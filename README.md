@@ -1,9 +1,15 @@
-# BAHA: Branch-Aware Optimizer
+<p align="center">
+  <img src="logo.png" alt="BAHA Logo" width="300"/>
+</p>
+
+# BAHA: Branch-Adaptive Hardness Aligner
 
 **The Fracture Hunter** - A next-generation optimization framework that detects and navigates structural discontinuities in optimization landscapes.
 
 [![Watch the Presentation](https://img.shields.io/badge/YouTube-Watch%20Presentation-red?style=for-the-badge&logo=youtube)](https://www.youtube.com/watch?v=jVKetFO7SgM)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18373732.svg)](https://doi.org/10.5281/zenodo.18373732)
+
+> **🏆 Notable Result:** Constructively proved **R(5,5,5) > 102** by 3-coloring K₁₀₂ (5,151 edges, 83.2M clique constraints) with **zero monochromatic K₅** in under 10 minutes on an RTX 3050.
 
 ## Overview
 
