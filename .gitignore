@@ -1,0 +1,7 @@
+*.o
+ramsey_cuda
+ramsey_benchmark
+sudoku_benchmark
+mis_benchmark
+dna_benchmark
+benchmarks/sudoku
