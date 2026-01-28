@@ -5,3 +5,7 @@ sudoku_benchmark
 mis_benchmark
 dna_benchmark
 benchmarks/sudoku
+sat3_benchmark
+sat3_trace
+unit_tests
+build/

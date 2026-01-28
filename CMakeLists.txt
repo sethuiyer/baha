@@ -180,6 +180,11 @@ if(BUILD_BENCHMARKS)
   endif()
 endif()
 
+# Tests
+add_executable(unit_tests tests/unit_tests.cpp)
+target_link_libraries(unit_tests baha)
+set_property(TARGET unit_tests PROPERTY CXX_STANDARD 17)
+
 # GPU support if available
 if(HAVE_CUDA)
   # GPU accelerated optimizer
