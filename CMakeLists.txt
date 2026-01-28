@@ -107,6 +107,14 @@ if(BUILD_EXAMPLES)
   add_executable(resource_allocation examples/resource_allocation.cpp)
   target_link_libraries(resource_allocation baha)
   set_property(TARGET resource_allocation PROPERTY CXX_STANDARD 17)
+
+  add_executable(adversarial_ml examples/adversarial_ml.cpp)
+  target_link_libraries(adversarial_ml baha)
+  set_property(TARGET adversarial_ml PROPERTY CXX_STANDARD 17)
+
+  add_executable(graph_coloring examples/graph_coloring.cpp)
+  target_link_libraries(graph_coloring baha)
+  set_property(TARGET graph_coloring PROPERTY CXX_STANDARD 17)
 endif()
 
 # Benchmarks
