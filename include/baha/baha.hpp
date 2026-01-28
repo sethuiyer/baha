@@ -300,6 +300,9 @@ public:
         // Analytic support
         std::function<double(double)> analytic_log_z = nullptr;
         std::function<double(double)> analytic_rho = nullptr;
+
+        // Optional backend hook for energy evaluation (e.g., CUDA/MPS).
+        std::function<double(const State&)> energy_override = nullptr;
     };
 
     struct Result {
@@ -328,6 +331,8 @@ public:
         Result result{};
         result.fractures_detected = 0;
         result.branch_jumps = 0;
+
+        energy_eval_ = config.energy_override ? config.energy_override : energy_;
         
         FractureDetectorOptimized detector(config.fracture_threshold);
 
@@ -336,7 +341,7 @@ public:
 
         // Initialize (move semantics)
         State current = sampler_();
-        double current_energy = energy_(current);
+        double current_energy = energy_eval_(current);
         State best = current;
         double best_energy = current_energy;
 
@@ -432,7 +437,7 @@ private:
         
         for (int i = 0; i < n_samples; ++i) {
             State s = sampler_();
-            double E = energy_(s);
+            double E = energy_eval_(s);
             log_terms_buffer_.push_back(-beta * E);
         }
         
@@ -477,7 +482,7 @@ private:
         
         for (int i = 0; i < n_samples; ++i) {
             State s = sampler_();
-            double E = energy_(s);
+            double E = energy_eval_(s);
             total_score += std::exp(-beta * E);
             best_seen = std::min(best_seen, E);
         }
@@ -510,7 +515,7 @@ private:
 
         // Jump to branch
         State jumped = sample_from_branch(best_branch.beta, config.samples_per_beta, current);
-        double jumped_energy = energy_(jumped);
+        double jumped_energy = energy_eval_(jumped);
 
         if (jumped_energy < best_energy) {
             best = jumped;
@@ -541,7 +546,7 @@ private:
         std::uniform_real_distribution<double> unif(0.0, 1.0);
         
         for (const auto& nbr : nbrs) {
-            const double nbr_energy = energy_(nbr);
+            const double nbr_energy = energy_eval_(nbr);
             const double delta = nbr_energy - current_energy;
             
             // Branch prediction friendly
@@ -563,7 +568,7 @@ private:
     // Sample from branch (MCMC + greedy descent)
     [[gnu::cold]] State sample_from_branch(double beta, int n_samples, const State& seed) {
         State current = seed;
-        double current_energy = energy_(current);
+        double current_energy = energy_eval_(current);
         
         if (!neighbors_) return current;
         
@@ -576,7 +581,7 @@ private:
             
             const int idx = std::uniform_int_distribution<>(0, nbrs.size()-1)(rng_);
             const auto& nbr = nbrs[idx];
-            const double nbr_energy = energy_(nbr);
+            const double nbr_energy = energy_eval_(nbr);
             const double delta = nbr_energy - current_energy;
             
             if (delta <= 0 || unif(rng_) < std::exp(-beta * delta)) {
@@ -592,7 +597,7 @@ private:
             auto nbrs = neighbors_(current);
             
             for (const auto& nbr : nbrs) {
-                const double E = energy_(nbr);
+                const double E = energy_eval_(nbr);
                 if (E < current_energy) {
                     current = nbr;
                     current_energy = E;
@@ -607,6 +612,7 @@ private:
 
     // Member variables
     EnergyFn energy_;
+    EnergyFn energy_eval_;
     SamplerFn sampler_;
     NeighborFn neighbors_;
     std::mt19937 rng_;
@@ -633,6 +639,7 @@ public:
         int beta_steps = 500;
         int steps_per_beta = 10;
         bool verbose = false;
+        std::function<double(const State&)> energy_override = nullptr;
     };
 
     struct Result {
@@ -650,8 +657,9 @@ public:
     Result optimize(const Config& config = Config()) {
         auto start_time = std::chrono::high_resolution_clock::now();
         Result result;
+        EnergyFn energy_eval = config.energy_override ? config.energy_override : energy_;
         State current = sampler_();
-        double current_energy = energy_(current);
+        double current_energy = energy_eval(current);
         State best = current;
         double best_energy = current_energy;
 
@@ -665,7 +673,7 @@ public:
 
                 std::uniform_int_distribution<> dist(0, nbrs.size() - 1);
                 State nbr = nbrs[dist(rng_)];
-                double nbr_energy = energy_(nbr);
+                double nbr_energy = energy_eval(nbr);
 
                 double delta = nbr_energy - current_energy;
                 if (delta < 0 || std::uniform_real_distribution<>(0, 1)(rng_) < std::exp(-beta * delta)) {
