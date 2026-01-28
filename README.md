@@ -285,3 +285,6 @@ If you use BAHA/Fracture in your research, please cite the original paper:
   url={https://doi.org/10.5281/zenodo.18373732}
 }
 ```
+
+BAHA is [uncomputably yours](https://www.youtube.com/playlist?list=PLUPyripldgZZUL-bMSeKDJbv-aRfPBUe6) and uses the math of [space time](https://www.youtube.com/playlist?list=PLUPyripldgZb2ZKSJOQ6p1DO3oCk9yT6G) to solve the hardest combinatorial problems.
+
