@@ -18,7 +18,7 @@ A simulated annealing variant that uses phase transition detection (fractures) a
 > - **Number Partitioning N=100k**: Near-optimal in 13.6s — **1.5M× faster** than random
 > - **DNA Barcode Design**: Perfect solution (0 violations) — **first application** of fracture-aware optimization to bioinformatics
 > - **20+ Problem Types Validated**: Constraint satisfaction, graph problems, scheduling, physics, security, biology
-> - **Graph Coloring (N=200)**: Solved 200-vertex graph with 0.5 edge probability in ~36s (54 colors, 0 conflicts) — demonstrates scalability on NP-hard problems
+> - **Graph Coloring (N=200)**: Found valid 53-coloring for a G(200, 0.5) graph in ~38s (0 conflicts, 1.6% jump rate) — demonstrates effective navigation of large, complex landscapes
 
 <p align="center">
   <img src="data/ramsey_102.webp" alt="Ramsey N=102 3-Coloring" width="500"/>

@@ -56,6 +56,19 @@ struct GraphColoringProblem {
     GraphColoringProblem(int n_vertices, double edge_prob = 0.5)
         : graph(n_vertices, edge_prob) {}
     
+    // Independent verification of coloring validity
+    double verify_coloring(const GraphColoringState& state) const {
+        double conflicts = 0;
+        for (int i = 0; i < graph.n_vertices; ++i) {
+            for (int j = i + 1; j < graph.n_vertices; ++j) {
+                if (graph.adj[i][j] && state.colors[i] == state.colors[j]) {
+                    conflicts += 1;
+                }
+            }
+        }
+        return conflicts;
+    }
+
     // Energy function: minimize conflicts and number of colors used
     double energy(const GraphColoringState& state) const {
         double conflicts = 0;
@@ -156,18 +169,12 @@ int main() {
     std::cout << "Branch jumps: " << result.branch_jumps << "\n";
     std::cout << "Solve time: " << duration.count() << " ms\n\n";
     
-    // Calculate final conflicts and unique colors
-    double final_conflicts = 0;
+    // Calculate final conflicts and unique colors using independent verifier
+    double final_conflicts = problem.verify_coloring(result.best_state);
     std::set<int> final_unique_colors;
     for (int i = 0; i < problem.graph.n_vertices; ++i) {
         final_unique_colors.insert(result.best_state.colors[i]);
-        for (int j = i + 1; j < problem.graph.n_vertices; ++j) {
-            if (problem.graph.adj[i][j] && result.best_state.colors[i] == result.best_state.colors[j]) {
-                final_conflicts += 1;
-            }
-        }
     }
-    
     std::cout << "Final conflicts: " << final_conflicts << "\n";
     std::cout << "Colors used: " << final_unique_colors.size() << "\n";
     
