@@ -149,6 +149,11 @@ if(BUILD_BENCHMARKS)
   target_link_libraries(diagnostic baha)
   set_property(TARGET diagnostic PROPERTY CXX_STANDARD 17)
 
+  # Mega Landscape Benchmark
+  add_executable(mega_benchmark benchmarks/mega_landscape_benchmark.cpp)
+  target_link_libraries(mega_benchmark baha)
+  set_property(TARGET mega_benchmark PROPERTY CXX_STANDARD 17)
+
   # Unified Ramsey solver (CPU/CUDA/MPS)
   set(RAMSEY_UNIFIED_SOURCES
     benchmarks/ramsey_unified.cpp

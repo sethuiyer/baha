@@ -87,6 +87,8 @@ Every problem type exhibits the same **five-phase pattern**:
 - The thermodynamic framework generalizes across discrete and continuous-relaxed problems
 - BAHA is a **structure exploitation framework**, not a universal solver
 
+- Use BAHA to solve the hardest combinatorial problems where structure exists, but stick to gradients for training neural networks 
+
 ## Technical Specification: B.A.H.A.
 
 **B.A.H.A.** — **Branch-Adaptive Hardness Aligner**
@@ -190,6 +192,18 @@ BAHA has been validated on **26+ problem types** across diverse domains, demonst
 - **Ramsey Theory**: $R(5,5,5) > 52$ proven, scaled to **83.2M constraints** @ N=102
 
 **Each domain exhibits different fracture types** (entropy-driven, feasibility-driven, symmetry-breaking, phase transitions, utility collapse, rare high-signal), but the **detection mechanism** (log-partition slope) and **response mechanism** (Lambert-W branch enumeration) are universal.
+
+## Strengths & Limitations
+
+> **"BAHA's branch jumping logic is highly effective for discrete combinatorial spaces (SAT, Ramsey, Graph Color) where 'barriers' are crisp."**
+
+| Domain | Effectiveness | Why? |
+|--------|---------------|------|
+| **Combinatorial (SAT, Graphs)** | ⭐⭐⭐⭐⭐ **Dominant** | Phase transitions are sharp; fractures are high-signal. |
+| **Constraint Satisfaction** | ⭐⭐⭐⭐⭐ **Dominant** | Feasibility boundaries create distinct thermodynamic sheets. |
+| **Discrete Optimization** | ⭐⭐⭐⭐ **Strong** | Escapes local traps better than SA/Tabu search. |
+| **Continuous R^N (Smooth)** | ⭐⭐ **Experimental** | Standard gradients work better; "fractures" are ill-defined on smooth manifolds. |
+| **Mixed Integer** | ⭐⭐⭐ **Good** | effective on the discrete variables, less so on continuous relaxation. |
 
 ## Architecture
 
