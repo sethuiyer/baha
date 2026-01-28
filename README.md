@@ -206,8 +206,9 @@ data/             - Benchmark data & results
 Complete documentation is available in the `docs/` directory:
 
 - **[docs/README.md](docs/README.md)** - Documentation index
+- **[docs/CASE_STUDY.md](docs/CASE_STUDY.md)** - Real-world performance benchmarks (26+ problems)
+- **[docs/PROBLEM_LIST.md](docs/PROBLEM_LIST.md)** - Complete catalog of all tested problems
 - **[docs/OPTIMIZATION_GUIDE.md](docs/OPTIMIZATION_GUIDE.md)** - CPU/GPU optimization techniques
-- **[docs/CASE_STUDY.md](docs/CASE_STUDY.md)** - Real-world performance benchmarks
 
 ## Performance Highlights
 
