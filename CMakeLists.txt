@@ -139,6 +139,11 @@ if(BUILD_BENCHMARKS)
   target_link_libraries(graph_iso_benchmark_hard baha)
   set_property(TARGET graph_iso_benchmark_hard PROPERTY CXX_STANDARD 17)
 
+  # Graph coloring distribution test
+  add_executable(graph_coloring_distribution benchmarks/graph_coloring_distribution.cpp)
+  target_link_libraries(graph_coloring_distribution baha)
+  set_property(TARGET graph_coloring_distribution PROPERTY CXX_STANDARD 17)
+
   # Diagnostic benchmark
   add_executable(diagnostic benchmarks/diagnostic.cpp)
   target_link_libraries(diagnostic baha)
