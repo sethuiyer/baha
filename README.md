@@ -41,7 +41,11 @@ Most optimizers do one of these:
 
 **BAHA does something rarer:**
 
-> **It exploits changes in structure.**
+> **It exploits Topological Shattering.**
+
+As constraints tighten in hard optimization problems, the solution space doesn't shrink smoothly — it **shatters** into disconnected clusters separated by high-energy walls. This is the "glassy phase" where standard algorithms get trapped in a single shard, mistaking local exploration for global optimization.
+
+BAHA detects the moment of shattering (the fracture signal) and uses Lambert-W branch enumeration to **jump between shards** — navigating the topology of the solution space rather than just climbing within it.
 
 That's why:
 
