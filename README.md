@@ -11,7 +11,7 @@ A simulated annealing variant that uses phase transition detection (fractures) a
 [![Watch the Presentation](https://img.shields.io/badge/YouTube-Watch%20Presentation-red?style=for-the-badge&logo=youtube)](https://www.youtube.com/watch?v=jVKetFO7SgM)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18373732.svg)](https://doi.org/10.5281/zenodo.18373732)
 
-> **🏆 Notable Results:**
+> **Notable Results:**
 > - **R(5,5,5) @ N=52**: Perfect 3-coloring with 2.6M constraints solved in <1s (RTX 3050) — [verifiable witness](data/ramsey_52_witness.csv)
 > - **Graph Isomorphism (N=50)**: **100% success rate** vs 20% for Simulated Annealing
 > - **Spectrum Auction**: **+102% revenue** ($2.4B vs $1.18B) in 1.657ms
@@ -45,10 +45,10 @@ Most optimizers do one of these:
 
 That's why:
 
-- ✅ **It generalizes across domains** — fracture detection works regardless of problem type
-- ✅ **It reduces to SA when nothing interesting happens** — no overhead when structure is absent
-- ✅ **It doesn't overjump on most problems** — selective exploitation (typically <2% jump rate)
-- ✅ **It shines when classical methods stall** — nonlocal jumps escape deep local minima
+- It generalizes across domains — fracture detection works regardless of problem type
+- It reduces to SA when nothing interesting happens — no overhead when structure is absent
+- It doesn't overjump on most problems — selective exploitation (typically <2% jump rate)
+- It shines when classical methods stall — nonlocal jumps escape deep local minima
 
 ### Core Invariant
 
