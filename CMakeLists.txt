@@ -66,6 +66,23 @@ if(BUILD_EXAMPLES)
   add_executable(isr_benchmarks examples/isr_benchmarks.cpp)
   target_link_libraries(isr_benchmarks baha)
   set_property(TARGET isr_benchmarks PROPERTY CXX_STANDARD 17)
+
+  # New problem types
+  add_executable(n_queens examples/n_queens.cpp)
+  target_link_libraries(n_queens baha)
+  set_property(TARGET n_queens PROPERTY CXX_STANDARD 17)
+
+  add_executable(max_cut examples/max_cut.cpp)
+  target_link_libraries(max_cut baha)
+  set_property(TARGET max_cut PROPERTY CXX_STANDARD 17)
+
+  add_executable(knapsack examples/knapsack.cpp)
+  target_link_libraries(knapsack baha)
+  set_property(TARGET knapsack PROPERTY CXX_STANDARD 17)
+
+  add_executable(traveling_salesman examples/traveling_salesman.cpp)
+  target_link_libraries(traveling_salesman baha)
+  set_property(TARGET traveling_salesman PROPERTY CXX_STANDARD 17)
 endif()
 
 # Benchmarks
@@ -163,6 +180,20 @@ if(BUILD_TESTS)
   if(HAVE_MPS)
     target_compile_definitions(ramsey_backend_test PRIVATE BAHA_HAVE_MPS_BACKEND=1)
     target_link_libraries(ramsey_backend_test ${METAL_FRAMEWORK} ${FOUNDATION_FRAMEWORK})
+  endif()
+
+  # Cross-platform BAHA test
+  add_executable(cross_platform_test tests/cross_platform_test.cpp)
+  target_link_libraries(cross_platform_test baha)
+  set_property(TARGET cross_platform_test PROPERTY CXX_STANDARD 17)
+
+  if(HAVE_CUDA)
+    target_compile_definitions(cross_platform_test PRIVATE BAHA_HAVE_CUDA_BACKEND=1)
+  endif()
+
+  if(HAVE_MPS)
+    target_compile_definitions(cross_platform_test PRIVATE BAHA_HAVE_MPS_BACKEND=1)
+    target_link_libraries(cross_platform_test ${METAL_FRAMEWORK} ${FOUNDATION_FRAMEWORK})
   endif()
 endif()
 

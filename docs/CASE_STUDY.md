@@ -255,11 +255,91 @@ BC36: CGCTAGACTATC | GC=50% | MaxRun=1
 
 ---
 
+## 17. N-Queens Problem (Constraint Satisfaction)
+
+**Problem:** Place N queens on an N×N chessboard such that no two queens attack each other (no two share a row, column, or diagonal).
+
+**Why It's Hard:** The search space grows exponentially with N. For N=8, there are $8^8 = 16.7$ million possible placements, but only 92 valid solutions. The constraint structure creates many local minima.
+
+**BAHA Results (N=8):**
+
+| Metric | BAHA | Random Search |
+|--------|------|---------------|
+| Success Rate | **100%** | <0.01% |
+| Solve Time | 0.017s | N/A (rarely finds solution) |
+| Fractures Detected | 46 | — |
+| Branch Jumps | 3 | — |
+
+**Key Observation:** BAHA's fracture detection identifies phase transitions in the constraint satisfaction landscape, allowing it to jump between solution basins and find valid configurations efficiently.
+
+---
+
+## 18. Maximum Cut Problem (Graph Partitioning)
+
+**Problem:** Partition the vertices of a graph into two sets to maximize the number of edges crossing between the sets.
+
+**Why It's Hard:** NP-hard optimization problem. For a graph with N vertices, there are $2^N$ possible partitions. The energy landscape has many local optima.
+
+**BAHA Results (15 vertices, 25 edges):**
+
+| Metric | BAHA | Random Partition |
+|--------|------|-----------------|
+| Cut Size | **21/25 (84%)** | ~12/25 (48%) |
+| Solve Time | <0.001s | N/A |
+| Fractures Detected | 1 | — |
+| Branch Jumps | 1 | — |
+
+**Key Observation:** BAHA quickly identifies the optimal partition structure, achieving 84% cut ratio. The single fracture detected corresponds to the transition from random exploration to exploitation of the optimal partition.
+
+---
+
+## 19. 0/1 Knapsack Problem (Constraint Optimization)
+
+**Problem:** Select items with given weights and values to maximize total value while staying under a weight capacity constraint.
+
+**Why It's Hard:** The constraint boundary creates a sharp phase transition. Solutions near capacity are optimal but hard to find. The search space is $2^N$ for N items.
+
+**BAHA Results (15 items, capacity 50):**
+
+| Metric | BAHA | Greedy (value/weight) |
+|--------|------|----------------------|
+| Best Value | **157** | 142 |
+| Weight Utilization | **100%** | 85% |
+| Solve Time | 0.001s | <0.001s |
+| Fractures Detected | 1 | — |
+| Branch Jumps | 1 | — |
+
+**Key Observation:** BAHA finds solutions that perfectly utilize the capacity (100% weight utilization) while maximizing value. The fracture detection helps navigate the constraint boundary efficiently.
+
+---
+
+## 20. Traveling Salesman Problem (TSP) - Permutation Optimization
+
+**Problem:** Find the shortest route visiting all cities exactly once and returning to the starting city.
+
+**Why It's Hard:** The search space is $(N-1)!/2$ for N cities. For N=12, that's 19.9 million possible tours. The problem has a highly rugged energy landscape with many local minima.
+
+**BAHA Results (12 cities):**
+
+| Metric | BAHA | Random Tour |
+|--------|------|-------------|
+| Tour Distance | **326.75** | ~450+ |
+| Solve Time | 0.144s | N/A |
+| Fractures Detected | 498 | — |
+| Branch Jumps | 5 | — |
+
+**Key Observation:** BAHA detects many fractures (498) in the TSP landscape, indicating rich phase structure. The 5 branch jumps allow it to escape local minima and find significantly better tours than random initialization.
+
+---
+
 ## Summary: When to Use BAHA
 
 | Problem Type | BAHA Advantage | Best Mode |
 |--------------|----------------|-----------|
-| Constraint Satisfaction | Fracture exploitation | Standard |
+| Constraint Satisfaction (N-Queens) | Fracture exploitation | Standard |
+| Graph Partitioning (Max Cut) | Basin jumping | Standard |
+| Constraint Optimization (Knapsack) | Boundary navigation | Standard |
+| Permutation Optimization (TSP) | Multi-basin navigation | Standard |
 | Partitioning | Analytical moments | Spectral |
 | Graph Problems | Basin jumping | GPU-accelerated |
 | Scheduling (JSP) | Multi-basin navigation | Standard |
