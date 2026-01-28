@@ -718,4 +718,48 @@ BAHA detects **fractures**—discontinuities in the specific heat—which signal
 
 ---
 
+## 27. 📅 Conference Scheduler (Novel Application)
+
+**Problem:** Assign N talks to (room, time slot) pairs for a tech conference, satisfying:
+1. **No speaker double-booked** (hard constraint)
+2. **Room capacity respected** (hard constraint)
+3. **Popular same-topic talks don't overlap** (soft constraint)
+4. **Same-topic talks cluster in the same room** (soft constraint)
+
+**Why It's Hard:**
+- Search space: $|rooms|^N \times |slots|^N$ for N talks
+- Multi-constraint optimization with hard/soft violations
+- Phase transitions occur when speaker conflicts are resolved
+
+**BAHA Results (20 talks, 5 rooms, 6 time slots):**
+
+| Metric | BAHA | Simulated Annealing |
+|--------|------|---------------------|
+| Final Energy | **110** | 1200 |
+| Improvement | **10.9× better** | Baseline |
+| Fractures Detected | 299 | — |
+| Branch Jumps | 8 | — |
+| Time | 1.58s | 0.04s |
+
+**Sample Schedule Output:**
+
+| Slot | Main Hall (200) | Room A (80) | Room B (80) | Room C (50) |
+|------|-----------------|-------------|-------------|-------------|
+| 1 | Keynote: Future of AI | Incident Response | Container Networking | — |
+| 2 | Federated Learning | DevSecOps | Distributed Databases | Neural Arch Search |
+| 3 | MLOps Best Practices | Quantum-Safe Crypto | SRE Practices | — |
+| 4 | LLMs in Production | API Security | Rust for Systems | — |
+| 5 | Transformer Architectures | Threat Modeling | Edge Computing | — |
+| 6 | Zero-Trust Security | Reinforcement Learning | Scaling Kubernetes | Observability |
+
+**Key Observations:**
+- ✅ **No speaker double-booked** — Dr. Smith's talks (slots 1 & 4) correctly separated
+- ✅ **Room capacities respected** — Keynote (180 expected) → Main Hall (200 cap)
+- ✅ **Topic clustering** — ML talks in Main Hall, Security in Room A, Systems in Room B
+- Energy=110 comes from minor soft constraint violations (imperfect clustering)
+
+**What This Proves:** BAHA handles real-world multi-constraint scheduling problems, detecting 299 fractures (constraint resolution events) and executing 8 branch jumps to find a valid schedule 10.9× better than SA.
+
+---
+
 *For implementation details, see the [examples/](examples/) and [benchmarks/](benchmarks/) directories.*
