@@ -9,6 +9,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 option(BUILD_EXAMPLES "Build example programs" ON)
 option(BUILD_BENCHMARKS "Build benchmark programs" ON)
 option(ENABLE_CUDA "Enable CUDA support" ON)
+option(ENABLE_MPS "Enable Metal/MPS support" ON)
+option(BUILD_TESTS "Build test programs" ON)
 
 # Compiler flags
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG")
@@ -24,6 +26,20 @@ if(ENABLE_CUDA)
   else()
     set(HAVE_CUDA FALSE)
     message(WARNING "CUDA not found, disabling CUDA support")
+  endif()
+endif()
+
+# Enable Metal/MPS on macOS
+if(ENABLE_MPS AND APPLE)
+  enable_language(OBJCXX)
+  find_library(METAL_FRAMEWORK Metal)
+  find_library(FOUNDATION_FRAMEWORK Foundation)
+  if(METAL_FRAMEWORK AND FOUNDATION_FRAMEWORK)
+    set(HAVE_MPS TRUE)
+    message(STATUS "Metal/MPS support enabled")
+  else()
+    set(HAVE_MPS FALSE)
+    message(WARNING "Metal frameworks not found, disabling MPS support")
   endif()
 endif()
 
@@ -78,6 +94,36 @@ if(BUILD_BENCHMARKS)
   add_executable(diagnostic benchmarks/diagnostic.cpp)
   target_link_libraries(diagnostic baha)
   set_property(TARGET diagnostic PROPERTY CXX_STANDARD 17)
+
+  # Unified Ramsey solver (CPU/CUDA/MPS)
+  set(RAMSEY_UNIFIED_SOURCES
+    benchmarks/ramsey_unified.cpp
+    benchmarks/ramsey_backend_cpu.cpp
+  )
+
+  if(HAVE_CUDA)
+    list(APPEND RAMSEY_UNIFIED_SOURCES benchmarks/ramsey_backend_cuda.cu)
+  endif()
+
+  if(HAVE_MPS)
+    list(APPEND RAMSEY_UNIFIED_SOURCES benchmarks/ramsey_backend_mps.mm)
+  endif()
+
+  add_executable(ramsey_unified ${RAMSEY_UNIFIED_SOURCES})
+  target_link_libraries(ramsey_unified baha)
+  target_include_directories(ramsey_unified PRIVATE ${PROJECT_SOURCE_DIR}/benchmarks)
+  set_property(TARGET ramsey_unified PROPERTY CXX_STANDARD 17)
+
+  if(HAVE_CUDA)
+    set_property(TARGET ramsey_unified PROPERTY CUDA_SEPARABLE_COMPILATION ON)
+    set_property(TARGET ramsey_unified PROPERTY CUDA_RESOLVE_DEVICE_SYMBOLS ON)
+    target_compile_definitions(ramsey_unified PRIVATE BAHA_HAVE_CUDA_BACKEND=1)
+  endif()
+
+  if(HAVE_MPS)
+    target_compile_definitions(ramsey_unified PRIVATE BAHA_HAVE_MPS_BACKEND=1)
+    target_link_libraries(ramsey_unified ${METAL_FRAMEWORK} ${FOUNDATION_FRAMEWORK})
+  endif()
 endif()
 
 # GPU support if available
@@ -86,6 +132,38 @@ if(HAVE_CUDA)
   add_executable(baha_gpu src/baha_gpu.cu)
   set_property(TARGET baha_gpu PROPERTY CUDA_SEPARABLE_COMPILATION ON)
   set_property(TARGET baha_gpu PROPERTY CUDA_RESOLVE_DEVICE_SYMBOLS ON)
+endif()
+
+# Tests
+if(BUILD_TESTS)
+  set(RAMSEY_TEST_SOURCES
+    tests/ramsey_backend_test.cpp
+    benchmarks/ramsey_backend_cpu.cpp
+  )
+
+  if(HAVE_CUDA)
+    list(APPEND RAMSEY_TEST_SOURCES benchmarks/ramsey_backend_cuda.cu)
+  endif()
+
+  if(HAVE_MPS)
+    list(APPEND RAMSEY_TEST_SOURCES benchmarks/ramsey_backend_mps.mm)
+  endif()
+
+  add_executable(ramsey_backend_test ${RAMSEY_TEST_SOURCES})
+  target_link_libraries(ramsey_backend_test baha)
+  target_include_directories(ramsey_backend_test PRIVATE ${PROJECT_SOURCE_DIR}/benchmarks)
+  set_property(TARGET ramsey_backend_test PROPERTY CXX_STANDARD 17)
+
+  if(HAVE_CUDA)
+    set_property(TARGET ramsey_backend_test PROPERTY CUDA_SEPARABLE_COMPILATION ON)
+    set_property(TARGET ramsey_backend_test PROPERTY CUDA_RESOLVE_DEVICE_SYMBOLS ON)
+    target_compile_definitions(ramsey_backend_test PRIVATE BAHA_HAVE_CUDA_BACKEND=1)
+  endif()
+
+  if(HAVE_MPS)
+    target_compile_definitions(ramsey_backend_test PRIVATE BAHA_HAVE_MPS_BACKEND=1)
+    target_link_libraries(ramsey_backend_test ${METAL_FRAMEWORK} ${FOUNDATION_FRAMEWORK})
+  endif()
 endif()
 
 # Install targets
