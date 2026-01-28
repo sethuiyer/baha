@@ -1,3 +1,6 @@
+/*
+ * Author: Sethurathienam Iyer
+ */
 #include <cuda_runtime.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,7 +38,8 @@ extern "C" void* ramsey_cuda_init(const uint16_t* clique_edges, int num_cliques,
     h->k_edges = k_edges;
     
     size_t clique_size = (size_t)num_cliques * k_edges * sizeof(uint16_t);
-    printf("Allocating %.2f MB for %d cliques...\n", (double)clique_size / (1024*1024), num_cliques);
+    printf("Allocating %.2f MB for %d cliques...
+", (double)clique_size / (1024*1024), num_cliques);
 
     if (cudaMalloc(&h->d_clique_edges, clique_size) != cudaSuccess) return NULL;
     cudaMemcpy(h->d_clique_edges, clique_edges, clique_size, cudaMemcpyHostToDevice);
@@ -68,7 +72,8 @@ extern "C" double ramsey_cuda_evaluate(void* handle, const int* edges, int num_e
     
     static int calls = 0;
     if (calls++ % 1000 == 0) {
-        printf("  [GPU Timer] N=102 evaluation: %.3f ms\n", milliseconds);
+        printf("  [GPU Timer] N=102 evaluation: %.3f ms
+", milliseconds);
     }
 
     int count;

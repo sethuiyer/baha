@@ -1,3 +1,6 @@
+/*
+ * Author: Sethurathienam Iyer
+ */
 #include "baha.hpp"
 #include <iostream>
 #include <vector>
@@ -98,8 +101,10 @@ public:
 
     void verify(const std::vector<int>& edges) {
         int count = (int)energy(edges);
-        if (count == 0) std::cout << "✅ VALID COLORING FOUND! R(5,5,5) > " << N << " Proven.\n";
-        else std::cout << "❌ Invalid. Mono cliques: " << count << "\n";
+        if (count == 0) std::cout << "✅ VALID COLORING FOUND! R(5,5,5) > " << N << " Proven.
+";
+        else std::cout << "❌ Invalid. Mono cliques: " << count << "
+";
     }
 };
 
@@ -124,26 +129,31 @@ int main() {
     config.verbose = true;
     config.schedule_type = navokoj::BranchAwareOptimizer<std::vector<int>>::ScheduleType::GEOMETRIC;
 
-    std::cout << "\nStarting BAHA (CUDA Accelerated)..." << std::endl;
+    std::cout << "
+Starting BAHA (CUDA Accelerated)..." << std::endl;
     auto result = baha.optimize(config);
 
-    std::cout << "\nRESULT:" << std::endl;
+    std::cout << "
+RESULT:" << std::endl;
     std::cout << "Final Energy: " << result.best_energy << std::endl;
     problem.verify(result.best_state);
 
     // Export witness CSV for verification
     if (result.best_energy == 0) {
         std::ofstream csv("data/ramsey_52_witness.csv");
-        csv << "edge_index,u,v,color\n";
+        csv << "edge_index,u,v,color
+";
         int idx = 0;
         for (int u = 0; u < 52; ++u) {
             for (int v = u + 1; v < 52; ++v) {
-                csv << idx << "," << u << "," << v << "," << result.best_state[idx] << "\n";
+                csv << idx << "," << u << "," << v << "," << result.best_state[idx] << "
+";
                 idx++;
             }
         }
         csv.close();
-        std::cout << "✅ Witness exported to data/ramsey_52_witness.csv\n";
+        std::cout << "✅ Witness exported to data/ramsey_52_witness.csv
+";
     }
 
     return 0;

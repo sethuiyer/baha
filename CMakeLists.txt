@@ -30,7 +30,8 @@ endif()
 # Main library
 add_library(baha INTERFACE)
 target_include_directories(baha INTERFACE
-  ${PROJECT_SOURCE_DIR}/include
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
 )
 
 # Examples

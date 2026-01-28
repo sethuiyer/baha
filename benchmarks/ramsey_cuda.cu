@@ -1,3 +1,6 @@
+/*
+ * Author: Sethurathienam Iyer
+ */
 #include "baha.hpp"
 #include <iostream>
 #include <vector>
@@ -13,7 +16,8 @@
 #define CHECK_CUDA(call) { \
     cudaError_t err = call; \
     if (err != cudaSuccess) { \
-        fprintf(stderr, "CUDA Error: %s at %s:%d\n", cudaGetErrorString(err), __FILE__, __LINE__); \
+        fprintf(stderr, "CUDA Error: %s at %s:%d
+", cudaGetErrorString(err), __FILE__, __LINE__); \
         exit(1); \
     } \
 }
@@ -145,8 +149,10 @@ public:
 
     void verify(const std::vector<int>& edges) {
         int count = (int)energy(edges);
-        if (count == 0) std::cout << "✅ VALID COLORING FOUND! R(5,5,5) > " << N << " Proven.\n";
-        else std::cout << "❌ Invalid. Mono cliques: " << count << "\n";
+        if (count == 0) std::cout << "✅ VALID COLORING FOUND! R(5,5,5) > " << N << " Proven.
+";
+        else std::cout << "❌ Invalid. Mono cliques: " << count << "
+";
     }
 };
 
@@ -171,10 +177,12 @@ int main() {
     config.verbose = true;
     config.schedule_type = navokoj::BranchAwareOptimizer<std::vector<int>>::ScheduleType::GEOMETRIC;
 
-    std::cout << "\nStarting BAHA (CUDA Accelerated)..." << std::endl;
+    std::cout << "
+Starting BAHA (CUDA Accelerated)..." << std::endl;
     auto result = baha.optimize(config);
 
-    std::cout << "\nRESULT:" << std::endl;
+    std::cout << "
+RESULT:" << std::endl;
     std::cout << "Final Energy: " << result.best_energy << std::endl;
     problem.verify(result.best_state);
 

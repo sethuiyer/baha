@@ -1,3 +1,6 @@
+/*
+ * Author: Sethurathienam Iyer
+ */
 #include "baha.hpp"
 #include "ramsey_engine.h"
 #include <iostream>
@@ -116,7 +119,8 @@ int main() {
     config.beta_steps = 50; 
 
     auto result = baha.optimize(config);
-    std::cout << "\nRESULT: Energy = " << result.best_energy << std::endl;
+    std::cout << "
+RESULT: Energy = " << result.best_energy << std::endl;
     problem.verify(result.best_state);
 
     std::ofstream out("solution_102.adj");

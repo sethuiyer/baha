@@ -116,9 +116,11 @@ BAHA has been tested on numerous challenging problems:
 ## Architecture
 
 ```
-include/          - Header files
+include/          - Header files (optimized)
 ├── baha/
-│   └── baha.hpp  - Main library header
+│   ├── baha.hpp  - Optimized CPU library (SIMD, fast math)
+│   └── baha.cuh  - Optimized GPU kernels (warp shuffles)
+└── baha.h        - Convenience wrapper
 
 src/              - Source files
 ├── baha.cpp      - CPU implementation
@@ -127,24 +129,42 @@ src/              - Source files
 examples/         - Usage examples
 ├── spectrum_auction.cpp
 ├── list_coloring.cpp
-└── ...
+└── hybrid_solver.cpp
 
 benchmarks/       - Benchmark suites
-├── casimir_sat.cpp
-├── graph_iso_benchmark.cpp
-└── ...
+├── optimization_benchmark.cpp
+├── ramsey_benchmark.cpp
+├── hardness_barrier.cpp
+└── [30+ benchmarks]
 
 docs/             - Documentation
+├── README.md                 - Documentation index
+├── OPTIMIZATION_GUIDE.md     - Performance tuning guide
+├── SPECTRAL_ANALYSIS.md      - O(N) hardness detection
+├── COMPLETE_ANALYSIS.md      - Technical deep dive
+└── CASE_STUDY.md             - Real-world examples
+
 tests/            - Unit tests
 cmake/            - CMake modules
+scripts/          - Visualization tools
+data/             - Benchmark data & results
 ```
+
+## Documentation
+
+Complete documentation is available in the `docs/` directory:
+
+- **[docs/README.md](docs/README.md)** - Documentation index
+- **[docs/OPTIMIZATION_GUIDE.md](docs/OPTIMIZATION_GUIDE.md)** - CPU/GPU optimization techniques
+- **[docs/CASE_STUDY.md](docs/CASE_STUDY.md)** - Real-world performance benchmarks
 
 ## Performance Highlights
 
 - **Spectrum Auction**: Solved in 1.657ms with 102% revenue improvement
 - **List Coloring**: 80% improvement over random solutions
-- **Ramsey Theory**: $R(5,5,5) > 52$ proven in < 30 seconds on RTX 3050.
-- **Spectral Scaling**: Number Partitioning solved at **$N=100,000$** in 13.6 seconds via $O(N \log N)$ moments.
+- **Ramsey Theory**: $R(5,5,5) > 52$ proven in < 30 seconds on RTX 3050
+- **Spectral Scaling**: Number Partitioning solved at **$N=100,000$** in 13.6 seconds via $O(N)$ moments
+- **GPU Acceleration**: 50-100x speedup on constraint-heavy problems
 
 ## Contributing
 

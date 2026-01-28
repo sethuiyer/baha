@@ -1,3 +1,6 @@
+/*
+ * Author: Sethurathienam Iyer
+ */
 #include <iostream>
 #include "baha/baha.hpp"
 

@@ -1,3 +1,6 @@
+/*
+ * Author: Sethurathienam Iyer
+ */
 #ifndef RAMSEY_ENGINE_H
 #define RAMSEY_ENGINE_H
 

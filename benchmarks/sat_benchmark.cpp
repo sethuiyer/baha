@@ -1,3 +1,6 @@
+/*
+ * Author: Sethurathienam Iyer
+ */
 #include "baha.hpp"
 #include <iostream>
 #include <vector>
@@ -28,8 +31,6 @@ public:
         
         for (int i = 0; i < m; ++i) {
             Clause c;
-            // Ensure unique literals in clause? Usually standard generation allows repeats but purists prefer unique.
-            // For N=50, k=5, collision is rare enough. We'll proceed with simple generation.
             for (int j = 0; j < 5; ++j) c.lits[j] = var_dist(rng_);
             for (int j = 0; j < 5; ++j) c.neg[j] = bool_dist(rng_);
             clauses_.push_back(c);
@@ -104,7 +105,7 @@ void run_sat_bench(const std::string& name, int n_trials, std::function<Problem(
         ba_config.beta_steps = 1000; 
         ba_config.beta_end = 20.0;   
         ba_config.max_branches = 10;
-        ba_config.schedule_type = navokoj::BranchAwareOptimizer<State>::ScheduleType::GEOMETRIC; // Using what we learned
+        ba_config.schedule_type = navokoj::BranchAwareOptimizer<State>::ScheduleType::GEOMETRIC;
 
         navokoj::BranchAwareOptimizer<State> ba(energy, sampler, neighbors);
         auto ba_res = ba.optimize(ba_config);
@@ -140,10 +141,9 @@ void run_sat_bench(const std::string& name, int n_trials, std::function<Problem(
 }
 
 int main() {
-    std::cout << "🔮 HIGH-DENSITY 5-SAT BENCHMARK 🔮\n";
+    std::cout << "HIGH-DENSITY 5-SAT BENCHMARK\n";
     std::cout << "Testing Deep UNSAT Phase (Constraint Density Alpha=30)\n";
 
-    // Random 5-SAT N=50, M=1500
     run_sat_bench<HardRandom5Sat, SatState>(
         "Random 5-SAT (N=50, M=1500, Alpha=30)", 
         5,

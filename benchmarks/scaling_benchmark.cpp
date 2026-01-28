@@ -1,3 +1,6 @@
+/*
+ * Author: Sethurathienam Iyer
+ */
 #include "baha.hpp"
 #include <iostream>
 #include <vector>
@@ -9,20 +12,15 @@
 
 // =============================================================================
 // SCALING NUMBER PARTITIONING
-// Problem: Split N numbers into two sets with equal sum.
-// Objective: Minimize |Sum(S1) - Sum(S2)|
 // =============================================================================
 
 struct PartitionState {
-    std::vector<int> s; // +1 or -1
+    std::vector<int> s;
 };
 
 class NumberPartitioningProblem {
 public:
     NumberPartitioningProblem(int n, int seed) : n_(n), rng_(seed) {
-        // Generate big numbers. 
-        // We use int64_t to be safe, but keep range somewhat limited to avoid immediate overflow
-        // Range 0 to 10^12. Sum can handle N*10^12 ~ 10^15 (fits in 10^18).
         std::uniform_int_distribution<long long> dist(1, 1000000000000LL);
         numbers_.resize(n);
         for(int i=0; i<n; ++i) numbers_[i] = dist(rng_);
@@ -47,11 +45,6 @@ public:
     }
 
     std::vector<PartitionState> neighbors(const PartitionState& state) {
-        // Large neighborhood is expensive at N=1000.
-        // We will sample a random subset of neighbors if N is large?
-        // Actually BAHA needs full neighborhood for local optimality check?
-        // No, standard BAHA uses a generator.
-        // Let's iterate all N neighbors. N=1000 is small enough for modern CPU.
         std::vector<PartitionState> nbrs;
         nbrs.reserve(n_);
         for (int i = 0; i < n_; ++i) {
@@ -103,7 +96,7 @@ void run_test(int n, int trials) {
         auto ba_res = ba.optimize(ba_config);
 
         typename navokoj::SimulatedAnnealing<State>::Config sa_config;
-        sa_config.beta_steps = 2000; // Same iteration budget
+        sa_config.beta_steps = 2000;
         sa_config.beta_end = 20.0;
         sa_config.steps_per_beta = 50; 
 
@@ -132,16 +125,11 @@ void run_test(int n, int trials) {
 }
 
 int main() {
-    std::cout << "🔨 THE HAMMER: SCALING BENCHMARK 🔨\n";
+    std::cout << "SCALING BENCHMARK\n";
     std::cout << "Testing if BAHA's fracture detection survives at scale.\n";
     
-    // N=200
     run_test<NumberPartitioningProblem, PartitionState>(200, 3);
-    
-    // N=500
     run_test<NumberPartitioningProblem, PartitionState>(500, 3);
-    
-    // N=1000
     run_test<NumberPartitioningProblem, PartitionState>(1000, 3);
 
     return 0;

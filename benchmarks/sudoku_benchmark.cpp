@@ -1,3 +1,6 @@
+/*
+ * Author: Sethurathienam Iyer
+ */
 #include "baha.hpp"
 #include <iostream>
 #include <vector>
@@ -8,19 +11,16 @@
 
 // =============================================================================
 // SUDOKU SOLVER USING BAHA
-// Solving AI Escargot - "The World's Hardest Sudoku"
 // =============================================================================
 
 struct SudokuState {
-    std::array<std::array<int, 9>, 9> grid;  // 1-9 for filled, 0 for empty
+    std::array<std::array<int, 9>, 9> grid;
 };
 
 class SudokuProblem {
 public:
     SudokuProblem(const std::array<std::array<int, 9>, 9>& initial, int seed)
         : initial_(initial), rng_(seed) {
-        
-        // Mark which cells are fixed (given clues)
         for (int i = 0; i < 9; ++i) {
             for (int j = 0; j < 9; ++j) {
                 fixed_[i][j] = (initial[i][j] != 0);
@@ -28,12 +28,9 @@ public:
         }
     }
 
-    // Energy = number of constraint violations
-    // Rows, Columns, and 3x3 Boxes must all have unique digits
     double energy(const SudokuState& state) const {
         int violations = 0;
         
-        // Check rows
         for (int i = 0; i < 9; ++i) {
             std::set<int> seen;
             for (int j = 0; j < 9; ++j) {
@@ -45,7 +42,6 @@ public:
             }
         }
         
-        // Check columns
         for (int j = 0; j < 9; ++j) {
             std::set<int> seen;
             for (int i = 0; i < 9; ++i) {
@@ -57,7 +53,6 @@ public:
             }
         }
         
-        // Check 3x3 boxes
         for (int bi = 0; bi < 3; ++bi) {
             for (int bj = 0; bj < 3; ++bj) {
                 std::set<int> seen;
@@ -75,7 +70,6 @@ public:
             }
         }
         
-        // Count empty cells as soft penalty
         int empty = 0;
         for (int i = 0; i < 9; ++i) {
             for (int j = 0; j < 9; ++j) {
@@ -90,8 +84,6 @@ public:
         SudokuState state;
         state.grid = initial_;
         
-        // CONSTRAINT-AWARE INITIALIZATION
-        // For each empty cell, only pick from valid candidates
         for (int i = 0; i < 9; ++i) {
             for (int j = 0; j < 9; ++j) {
                 if (!fixed_[i][j]) {
@@ -100,7 +92,6 @@ public:
                         std::uniform_int_distribution<int> dist(0, candidates.size() - 1);
                         state.grid[i][j] = candidates[dist(rng_)];
                     } else {
-                        // Fallback to random if no valid candidates
                         std::uniform_int_distribution<int> digit_dist(1, 9);
                         state.grid[i][j] = digit_dist(rng_);
                     }
@@ -112,18 +103,12 @@ public:
 
     std::vector<int> get_candidates(const SudokuState& state, int row, int col) const {
         std::set<int> used;
-        
-        // Row
         for (int j = 0; j < 9; ++j) {
             if (state.grid[row][j] != 0) used.insert(state.grid[row][j]);
         }
-        
-        // Column
         for (int i = 0; i < 9; ++i) {
             if (state.grid[i][col] != 0) used.insert(state.grid[i][col]);
         }
-        
-        // Box
         int bi = (row / 3) * 3, bj = (col / 3) * 3;
         for (int di = 0; di < 3; ++di) {
             for (int dj = 0; dj < 3; ++dj) {
@@ -132,7 +117,6 @@ public:
                 }
             }
         }
-        
         std::vector<int> candidates;
         for (int d = 1; d <= 9; ++d) {
             if (used.find(d) == used.end()) candidates.push_back(d);
@@ -142,8 +126,6 @@ public:
 
     std::vector<SudokuState> neighbors(const SudokuState& state) {
         std::vector<SudokuState> nbrs;
-        
-        // Find cells that are part of a violation
         std::vector<std::pair<int, int>> violated_cells;
         for (int i = 0; i < 9; ++i) {
             for (int j = 0; j < 9; ++j) {
@@ -153,42 +135,30 @@ public:
             }
         }
         
-        // If solved/no obviously violated cells, doing random exploration is fine
         if (violated_cells.empty()) {
             return generate_random_neighbors(state);
         }
         
-        // Target specific violations
         std::uniform_int_distribution<int> cell_dist(0, violated_cells.size() - 1);
         
-        // 1. Try to fix a random violated cell by picking its BEST candidate
         for (int k = 0; k < 10; ++k) {
             auto [r, c] = violated_cells[cell_dist(rng_)];
-            int best_val = state.grid[r][c];
             int current_conflicts = get_conflicts(state, r, c);
             
-            // Try all possible values 1-9
             for (int v = 1; v <= 9; ++v) {
                 if (v == state.grid[r][c]) continue;
-                
                 SudokuState trial = state;
                 trial.grid[r][c] = v;
                 int new_conflicts = get_conflicts(trial, r, c);
-                
-                // If it reduces conflicts, it's a strong candidate
                 if (new_conflicts < current_conflicts) {
                     nbrs.push_back(trial);
                 }
             }
         }
         
-        // 2. Try doing a Min-Conflicts swap within a row/col/box
-        // (Swapping heavily penalizes energy usually, but can escape local optima)
-        // We'll revert to random neighbors if intelligent moves aren't found
         if (nbrs.empty()) {
             return generate_random_neighbors(state);
         }
-        
         return nbrs;
     }
 
@@ -213,12 +183,8 @@ public:
         int val = state.grid[r][c];
         if (val == 0) return 0;
         int conflicts = 0;
-        
-        // Row
         for (int j = 0; j < 9; ++j) if (j != c && state.grid[r][j] == val) conflicts++;
-        // Col
         for (int i = 0; i < 9; ++i) if (i != r && state.grid[i][c] == val) conflicts++;
-        // Box
         int bi = (r / 3) * 3, bj = (c / 3) * 3;
         for (int di = 0; di < 3; ++di) {
             for (int dj = 0; dj < 3; ++dj) {
@@ -230,23 +196,23 @@ public:
     }
 
     void print_grid(const SudokuState& state) const {
-        std::cout << "┌───────┬───────┬───────┐\n";
+        std::cout << "+-------+-------+-------+\n";
         for (int i = 0; i < 9; ++i) {
-            std::cout << "│ ";
+            std::cout << "| ";
             for (int j = 0; j < 9; ++j) {
                 if (state.grid[i][j] == 0) {
                     std::cout << ". ";
                 } else {
                     std::cout << state.grid[i][j] << " ";
                 }
-                if (j % 3 == 2) std::cout << "│ ";
+                if (j % 3 == 2) std::cout << "| ";
             }
             std::cout << "\n";
             if (i % 3 == 2 && i < 8) {
-                std::cout << "├───────┼───────┼───────┤\n";
+                std::cout << "+-------+-------+-------+\n";
             }
         }
-        std::cout << "└───────┴───────┴───────┘\n";
+        std::cout << "+-------+-------+-------+\n";
     }
 
     bool verify(const SudokuState& state) const {
@@ -260,12 +226,10 @@ private:
 };
 
 int main() {
-    std::cout << "🐌 AI ESCARGOT - THE WORLD'S HARDEST SUDOKU 🐌\n";
+    std::cout << "AI ESCARGOT - SUDOKU BENCHMARK\n";
     std::cout << "Solving with BAHA Fracture Detection\n";
     std::cout << "==========================================\n\n";
 
-    // AI Escargot puzzle - designed by Arto Inkala (2006)
-    // Considered one of the most difficult Sudoku puzzles ever created
     std::array<std::array<int, 9>, 9> ai_escargot = {{
         {1, 0, 0, 0, 0, 7, 0, 9, 0},
         {0, 3, 0, 0, 2, 0, 0, 0, 8},
@@ -321,9 +285,9 @@ int main() {
     problem.print_grid(result.best_state);
 
     if (problem.verify(result.best_state)) {
-        std::cout << "\n✅ SOLVED! All constraints satisfied.\n";
+        std::cout << "\nSOLVED! All constraints satisfied.\n";
     } else {
-        std::cout << "\n⚠️ Not fully solved. Violations remaining: " << result.best_energy << "\n";
+        std::cout << "\nNot fully solved. Violations remaining: " << result.best_energy << "\n";
     }
 
     return 0;
