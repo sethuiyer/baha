@@ -87,6 +87,8 @@ Every problem type exhibits the same **five-phase pattern**:
 - The thermodynamic framework generalizes across discrete and continuous-relaxed problems
 - BAHA is a **structure exploitation framework**, not a universal solver
 
+> 💡 **If the problem sounds like "assign things to slots while avoiding conflicts", BAHA will crush it.**
+
 - Use BAHA to solve the hardest combinatorial problems where structure exists, but stick to gradients for training neural networks 
 
 ## Technical Specification: B.A.H.A.
