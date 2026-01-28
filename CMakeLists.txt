@@ -83,6 +83,30 @@ if(BUILD_EXAMPLES)
   add_executable(traveling_salesman examples/traveling_salesman.cpp)
   target_link_libraries(traveling_salesman baha)
   set_property(TARGET traveling_salesman PROPERTY CXX_STANDARD 17)
+
+  add_executable(vehicle_routing examples/vehicle_routing.cpp)
+  target_link_libraries(vehicle_routing baha)
+  set_property(TARGET vehicle_routing PROPERTY CXX_STANDARD 17)
+
+  add_executable(bin_packing examples/bin_packing.cpp)
+  target_link_libraries(bin_packing baha)
+  set_property(TARGET bin_packing PROPERTY CXX_STANDARD 17)
+
+  add_executable(max_clique examples/max_clique.cpp)
+  target_link_libraries(max_clique baha)
+  set_property(TARGET max_clique PROPERTY CXX_STANDARD 17)
+
+  add_executable(course_scheduling examples/course_scheduling.cpp)
+  target_link_libraries(course_scheduling baha)
+  set_property(TARGET course_scheduling PROPERTY CXX_STANDARD 17)
+
+  add_executable(network_design examples/network_design.cpp)
+  target_link_libraries(network_design baha)
+  set_property(TARGET network_design PROPERTY CXX_STANDARD 17)
+
+  add_executable(resource_allocation examples/resource_allocation.cpp)
+  target_link_libraries(resource_allocation baha)
+  set_property(TARGET resource_allocation PROPERTY CXX_STANDARD 17)
 endif()
 
 # Benchmarks
