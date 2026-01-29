@@ -6,9 +6,9 @@ import random
 import itertools
 from dataclasses import dataclass
 
-# Problem: Ramsey R(3,3,3) @ N=14
-# Find a 3-coloring of edges in K14 with no monochromatic triangles.
-N_NODES = 14
+# Problem: Ramsey R(3,3,3) @ N=16
+# Find a 3-coloring of edges in K16 with no monochromatic triangles.
+N_NODES = 16
 EDGES = list(itertools.combinations(range(N_NODES), 2))
 TRIANGLES = list(itertools.combinations(range(N_NODES), 3))
 
@@ -32,6 +32,10 @@ class RamseyState:
     colors: list
     energy: float
 
+    # To make state printable in baha-cli or result dumps
+    def __repr__(self):
+        return "".join(map(str, self.colors))
+
 def compute_initial_energy(colors):
     violations = 0
     for e1, e2, e3 in TRI_EDGE_IDXS:
@@ -48,22 +52,17 @@ def sampler():
 
 def neighbors(state):
     nbrs = []
-    # Try flipping 32 random edges
-    for _ in range(32):
+    # Try flipping 64 random edges (N=16 is denser)
+    for _ in range(64):
         edge_idx = random.randrange(len(EDGES))
         current_color = state.colors[edge_idx]
         for new_color in range(3):
             if new_color != current_color:
-                # Delta Update Calculation
                 delta = 0
                 for tri_idx in EDGE_TO_TRI_IDXS[edge_idx]:
                     e1, e2, e3 = TRI_EDGE_IDXS[tri_idx]
-                    # Check if old triangle was monochromatic
                     if state.colors[e1] == state.colors[e2] == state.colors[e3]:
                         delta -= 1
-                    # Check if new triangle becomes monochromatic
-                    # We temporarily assume the edge has new_color
-                    # But we only need to check the other two edges against new_color
                     other1 = e1 if e1 != edge_idx else e2
                     other2 = e3 if e3 != edge_idx else e2
                     if state.colors[other1] == new_color and state.colors[other2] == new_color:
@@ -74,19 +73,26 @@ def neighbors(state):
                 nbrs.append(RamseyState(new_cols, float(state.energy + delta)))
     return nbrs
 
-print(f"💎 CRACKING RAMSEY R(3,3,3) @ N={N_NODES} 💎")
-print("Using Delta-Energy Optimization (O(N) neighbor updates)")
+print(f"💎 HUNTING RAMSEY R(3,3,3) @ N={N_NODES} 💎")
+print(f"Edges: {len(EDGES)}, Triangles: {len(TRIANGLES)}")
+print("60-Second Timeout Engaged.")
 
 # BAHA Setup
 opt = pybaha.Optimizer(energy_fn, sampler, neighbors)
 config = pybaha.Config()
-config.beta_steps = 1500
-config.beta_end = 40.0
-config.fracture_threshold = 1.2
-config.verbose = True
+config.beta_steps = 100000 
+config.beta_end = 50.0
+config.timeout_ms = 60000.0 # 60 seconds
+config.verbose = False
 config.max_branches = 8
 
 result = opt.optimize(config)
+
+print(f"\nFinal Violations: {result.best_energy}")
+print(f"Timeout Hit: {result.timeout_reached}")
+print(f"Time: {result.time_ms/1000.0:.2f}s")
+print(f"\nBEST STATE (Edge Coloring):")
+print(result.best_state)
 
 print(f"\nFinal Violations: {result.best_energy}")
 print(f"Fractures: {result.fractures_detected}, Jumps: {result.branch_jumps}")
