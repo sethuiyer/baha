@@ -248,26 +248,33 @@ if result.best_state == TARGET_KEY:
 
 BAHA has several parameters to handle different landscape types:
 
-| Parameter | Default | When to Change |
-| :--- | :--- | :--- |
-| `beta_steps` | 500 | Increase for larger/harder problems. |
-| `beta_end` | 10.0 | Increase if you are getting "stuck" near the global minimum. |
-| `fracture_threshold` | 1.5 | Decrease (e.g. 1.1) to make the jump logic more aggressive. |
-| `max_branches` | 5 | Increase if the landscape has many "shattered" clusters (e.g. SAT). |
 | `schedule_type` | `LINEAR` | Use `GEOMETRIC` for problems with exponential energy ranges. |
 | `timeout_ms` | -1.0 | Set a positive value (e.g. 5000.0) for a strict time budget. |
+| `validator` | `None` | A function that takes `state` and returns a metric (e.g. satisfaction %). |
 
 ---
 
-## 📊 9. Interpreting the Results
+## 📊 9. Interpreting & Visualizing Results
 
-The `Result` object tells you *how* BAHA solved the problem:
+BAHA provides rich analytics for auditing your optimization runs.
 
+### Result Fields
 - **`best_energy`**: Final result.
-- **`fractures_detected`**: How many times the landscape "broke" (high stress).
-- **`branch_jumps`**: How many times BAHA used the Riemann surface to teleport to a new basin.
-- **`time_ms`**: Total solve time in milliseconds.
-- **`timeout_reached`**: Boolean flag indicating if the search stopped due to the time budget.
+- **`energy_history`**: A list of energy values at every step. Use this to plot convergence.
+- **`validation_metric`**: The result of your custom `validator` function.
+- **`time_ms`**: Total solve time.
+
+### Convergence Plot Example
+```python
+import matplotlib.pyplot as plt
+
+result = opt.optimize(config)
+plt.plot(result.energy_history)
+plt.title("BAHA Convergence Curve")
+plt.xlabel("Step")
+plt.ylabel("Energy")
+plt.show()
+```
 
 ---
 

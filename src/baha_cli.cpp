@@ -103,6 +103,8 @@ int main(int argc, char** argv) {
         res_json["fractures"] = result.fractures_detected;
         res_json["jumps"] = result.branch_jumps;
         res_json["timeout_reached"] = result.timeout_reached;
+        res_json["energy_history"] = result.energy_history;
+        res_json["validation_metric"] = result.validation_metric;
         
         std::cout << res_json.dump(2) << std::endl;
     } else {

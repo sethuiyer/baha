@@ -305,6 +305,9 @@ public:
         std::function<double(const State&)> energy_override = nullptr;
 
         double timeout_ms = -1.0; // -1 means no timeout
+        
+        // Custom validator to calculate satisfaction metrics (e.g. %)
+        std::function<double(const State&)> validator = nullptr;
     };
 
     struct Result {
@@ -316,6 +319,8 @@ public:
         int steps_taken;
         double time_ms;
         bool timeout_reached = false;
+        std::vector<double> energy_history;
+        double validation_metric = 0.0;
     };
 
     BranchAwareOptimizer(EnergyFn energy, SamplerFn sampler, NeighborFn neighbors = nullptr)
@@ -398,6 +403,8 @@ public:
                 perform_local_search(beta, current, current_energy, best, best_energy);
             }
 
+            result.energy_history.push_back(current_energy);
+
             // Anytime check: timeout budget
             if (EXPECT_FALSE(config.timeout_ms > 0)) {
                 auto now = std::chrono::high_resolution_clock::now();
@@ -415,7 +422,12 @@ public:
         result.best_state = std::move(best);
         result.best_energy = best_energy;
         result.beta_at_solution = config.beta_end;
-        result.steps_taken = config.beta_steps;
+        result.steps_taken = (int)result.energy_history.size();
+
+        if (config.validator) {
+            result.validation_metric = config.validator(result.best_state);
+        }
+
         auto end_time = std::chrono::high_resolution_clock::now();
         result.time_ms = std::chrono::duration<double, std::milli>(
             end_time - start_time).count();
