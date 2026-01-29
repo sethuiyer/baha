@@ -109,6 +109,11 @@ result = opt.optimize()
 
 if result.best_energy == 0:
     print(f"✅ Solved: {result.best_state}")
+
+# Expected Output:
+# 🎯 Solution: [3, 1, 6, 2, 5, 7, 4, 0] (Energy: 0.0)
+# ⚡ Fractures Detected: 2
+# 🔀 Branch Jumps: 2
 ```
 
 ---
@@ -147,6 +152,10 @@ def sampler():
 # stuck in "nearly full" local minima.
 opt = pybaha.Optimizer(energy, sampler)
 result = opt.optimize()
+
+# Expected Output:
+# Final Bins Used: 4
+# Fractures: 991, Jumps: 2
 ```
 
 ---
@@ -187,6 +196,10 @@ def neighbors(path):
 
 opt = pybaha.Optimizer(energy, sampler, neighbors)
 result = opt.optimize()
+
+# Expected Output:
+# Final Path Distance: 2.7225
+# Fractures: 975, Jumps: 7
 ```
 
 ---
@@ -222,6 +235,11 @@ result = opt.optimize()
 
 if result.best_state == TARGET_KEY:
     print(f"🚨 ALERT: KEY RECOVERED: {hex(result.best_state)}")
+
+# Expected Output:
+# ⚡ FRACTURE at β=0.020, ρ=15.920
+#  🔀 JUMPED to E=0.000
+# 🚨 ALERT: KEY RECOVERED: 0xdeadbeef
 ```
 
 ---
