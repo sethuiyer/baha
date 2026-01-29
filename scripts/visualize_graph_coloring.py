@@ -12,6 +12,13 @@ import numpy as np
 from matplotlib.patches import FancyBboxPatch
 import matplotlib.colors as mcolors
 
+import sys
+import os
+# Ensure the module can find pybaha in the root
+sys.path.append(os.getcwd())
+import pybaha
+import random
+
 def create_petersen_graph():
     """Create the famous Petersen graph - requires exactly 3 colors."""
     return nx.petersen_graph()
@@ -22,10 +29,7 @@ def create_random_graph(n=12, p=0.4, seed=42):
 
 def baha_style_coloring(G, max_iterations=1000, max_colors=None):
     """
-    Simulates BAHA-style graph coloring with fracture detection.
-    Returns coloring and stats.
-    
-    If max_colors is set, constrains the coloring to use at most that many colors.
+    Uses the REAL BAHA C++ core via pybind11 for graph coloring.
     """
     n = G.number_of_nodes()
     edges = list(G.edges())
@@ -33,76 +37,46 @@ def baha_style_coloring(G, max_iterations=1000, max_colors=None):
     # Determine color bound
     color_bound = max_colors if max_colors else n
     
-    # Initialize random coloring within bounds
-    colors = {node: np.random.randint(0, color_bound) for node in G.nodes()}
-    best_colors = colors.copy()
+    # Define Energy (conflicts)
+    def energy(state):
+        return float(sum(1 for u, v in edges if state[u] == state[v]))
     
-    def count_conflicts(c):
-        return sum(1 for u, v in edges if c[u] == c[v])
+    # Define Sampler
+    def sampler():
+        return {node: random.randint(0, color_bound - 1) for node in G.nodes()}
     
-    def count_unique_colors(c):
-        return len(set(c.values()))
+    # Define Neighbor Function (subset sampling for performance)
+    def neighbors(state):
+        nbrs = []
+        nodes = list(G.nodes())
+        for _ in range(min(32, n * color_bound)):
+            node = random.choice(nodes)
+            new_color = random.randint(0, color_bound - 1)
+            if new_color != state[node]:
+                nbr = state.copy()
+                nbr[node] = new_color
+                nbrs.append(nbr)
+        return nbrs
+
+    # Initialize Optimizer
+    opt = pybaha.Optimizer(energy, sampler, neighbors)
     
-    best_conflicts = count_conflicts(colors)
-    best_n_colors = count_unique_colors(colors)
+    # Configure
+    config = pybaha.Config()
+    config.beta_steps = max_iterations
+    config.beta_end = 20.0
+    config.verbose = False
+    config.schedule_type = pybaha.ScheduleType.GEOMETRIC
     
-    # BAHA-style optimization with fracture simulation
-    fractures = 0
-    jumps = 0
-    beta = 0.01
-    beta_end = 10.0
+    # Run REAL optimization
+    result = opt.optimize(config)
     
-    log_z_prev = -beta * best_conflicts
-    
-    for iteration in range(max_iterations):
-        # Anneal
-        beta = 0.01 + (beta_end - 0.01) * (iteration / max_iterations)
-        
-        # Try a move: change one node's color
-        node = np.random.choice(list(G.nodes()))
-        old_color = colors[node]
-        new_color = np.random.randint(0, color_bound)  # Stay within bound
-        colors[node] = new_color
-        
-        new_conflicts = count_conflicts(colors)
-        delta_e = new_conflicts - count_conflicts({**colors, node: old_color})
-        
-        # Metropolis acceptance
-        if delta_e < 0 or np.random.random() < np.exp(-beta * delta_e):
-            # Accept
-            if new_conflicts < best_conflicts:
-                best_colors = colors.copy()
-                best_conflicts = new_conflicts
-                best_n_colors = count_unique_colors(colors)
-        else:
-            colors[node] = old_color  # Reject
-        
-        # Simulate fracture detection
-        log_z = -beta * count_conflicts(colors)
-        rho = abs(log_z - log_z_prev) / (beta_end / max_iterations)
-        
-        if rho > 50:  # Fracture threshold
-            fractures += 1
-            # Simulate branch jump occasionally
-            if np.random.random() < 0.02:
-                jumps += 1
-                # Jump: greedy reassignment of conflicting nodes
-                for u, v in edges:
-                    if colors[u] == colors[v]:
-                        colors[u] = (colors[u] + 1) % color_bound
-        
-        log_z_prev = log_z
-        
-        # Early exit if perfect
-        if best_conflicts == 0:
-            break
-    
-    return best_colors, {
-        'conflicts': best_conflicts,
-        'colors_used': count_unique_colors(best_colors),
-        'fractures': fractures,
-        'jumps': jumps,
-        'iterations': iteration + 1
+    return result.best_state, {
+        'conflicts': int(result.best_energy),
+        'colors_used': len(set(result.best_state.values())),
+        'fractures': result.fractures_detected,
+        'jumps': result.branch_jumps,
+        'iterations': result.steps_taken
     }
 
 def visualize_coloring(G, colors, stats, title="BAHA Graph Coloring"):
