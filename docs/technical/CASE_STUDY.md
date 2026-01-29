@@ -72,7 +72,7 @@ These are **different reasons** for the same signal to appear—evidence that fr
 ## 1. Energy Landscape & Fracture Detection
 
 <p align="center">
-  <img src="data/energy_landscape.webp" alt="BAHA Energy Landscape" width="700"/>
+  <img src="../../data/energy_landscape.webp" alt="BAHA Energy Landscape" width="700"/>
 </p>
 
 **Core Concept:** Unlike Simulated Annealing which "walks" through the energy landscape, BAHA detects **fractures** (sharp discontinuities in log Z) and performs **Lambert-W branch jumps** to teleport between solution basins.
@@ -88,7 +88,7 @@ These are **different reasons** for the same signal to appear—evidence that fr
 ## 2. List Coloring (Constrained Graph Coloring)
 
 <p align="center">
-  <img src="data/list_coloring.webp" alt="List Coloring" width="650"/>
+  <img src="../../data/list_coloring.webp" alt="List Coloring" width="650"/>
 </p>
 
 **Problem:** Each vertex has its own list of allowed colors. Find a valid coloring where no adjacent vertices share the same color.
@@ -106,7 +106,7 @@ These are **different reasons** for the same signal to appear—evidence that fr
 ## 3. Graph Isomorphism (N=50)
 
 <p align="center">
-  <img src="data/graph_iso.webp" alt="Graph Isomorphism" width="650"/>
+  <img src="../../data/graph_iso.webp" alt="Graph Isomorphism" width="650"/>
 </p>
 
 **Problem:** Given two graphs, find the vertex mapping that proves they are structurally identical.
@@ -123,7 +123,7 @@ These are **different reasons** for the same signal to appear—evidence that fr
 ## 4. Ramsey Theory: R(5,5,5) @ N=52
 
 <p align="center">
-  <img src="data/ramsey_102.webp" alt="Ramsey Coloring" width="500"/>
+  <img src="../../data/ramsey_102.webp" alt="Ramsey Coloring" width="500"/>
 </p>
 
 **Problem:** 3-color the edges of a complete graph $K_N$ such that no monochromatic $K_5$ exists.

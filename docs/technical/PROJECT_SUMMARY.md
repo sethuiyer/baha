@@ -25,11 +25,11 @@ baha/
 │   └── index.md            # Main documentation
 ├── cmake/                  # CMake modules
 ├── CMakeLists.txt          # Main CMake configuration
-├── README.md               # Project overview
+├── ../../README.md               # Project overview
 ├── LICENSE                 # License information
-├── CONTRIBUTING.md         # Contribution guidelines
-├── CHANGELOG.md            # Version history
-├── build.sh                # Build script
+├── ../../CONTRIBUTING.md         # Contribution guidelines
+├── ../../CHANGELOG.md            # Version history
+├── ../../build.sh                # Build script
 └── ...                     # Other project files
 ```
 

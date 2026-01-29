@@ -538,7 +538,7 @@ nvcc -std=c++17 -O3 -arch=sm_80 \
 Compile and run the benchmark:
 
 ```bash
-cd /Users/sethuiyer/Documents/Workspace/baha
+cd /home/sethuiyer/Documents/Workspace/baha
 g++ -std=c++17 -O3 -march=native -mavx2 -mfma \
     -I include benchmarks/optimization_benchmark.cpp -o opt_bench
 ./opt_bench
