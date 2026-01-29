@@ -90,6 +90,7 @@ int main(int argc, char** argv) {
             config.beta_steps = c.value("beta_steps", 1000);
             config.beta_end = c.value("beta_end", 20.0);
             config.verbose = c.value("verbose", true);
+            config.timeout_ms = c.value("timeout_ms", -1.0);
         }
         
         auto result = opt.optimize(config);
@@ -101,6 +102,7 @@ int main(int argc, char** argv) {
         res_json["time_ms"] = result.time_ms;
         res_json["fractures"] = result.fractures_detected;
         res_json["jumps"] = result.branch_jumps;
+        res_json["timeout_reached"] = result.timeout_reached;
         
         std::cout << res_json.dump(2) << std::endl;
     } else {

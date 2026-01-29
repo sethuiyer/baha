@@ -303,6 +303,8 @@ public:
 
         // Optional backend hook for energy evaluation (e.g., CUDA/MPS).
         std::function<double(const State&)> energy_override = nullptr;
+
+        double timeout_ms = -1.0; // -1 means no timeout
     };
 
     struct Result {
@@ -313,6 +315,7 @@ public:
         double beta_at_solution;
         int steps_taken;
         double time_ms;
+        bool timeout_reached = false;
     };
 
     BranchAwareOptimizer(EnergyFn energy, SamplerFn sampler, NeighborFn neighbors = nullptr)
@@ -393,6 +396,19 @@ public:
             // Local search (hot path)
             if (EXPECT_TRUE(neighbors_)) {
                 perform_local_search(beta, current, current_energy, best, best_energy);
+            }
+
+            // Anytime check: timeout budget
+            if (EXPECT_FALSE(config.timeout_ms > 0)) {
+                auto now = std::chrono::high_resolution_clock::now();
+                double elapsed = std::chrono::duration<double, std::milli>(now - start_time).count();
+                if (elapsed >= config.timeout_ms) {
+                    result.timeout_reached = true;
+                    if (config.verbose) {
+                        std::cout << "⏱️ TIMEOUT REACHED at " << elapsed << "ms\n";
+                    }
+                    break;
+                }
             }
         }
 
@@ -640,6 +656,7 @@ public:
         int steps_per_beta = 10;
         bool verbose = false;
         std::function<double(const State&)> energy_override = nullptr;
+        double timeout_ms = -1.0;
     };
 
     struct Result {
@@ -648,6 +665,7 @@ public:
         double beta_at_solution;
         int steps_taken;
         double time_ms;
+        bool timeout_reached = false;
     };
 
     SimulatedAnnealing(EnergyFn energy, SamplerFn sampler, NeighborFn neighbors)
@@ -671,7 +689,7 @@ public:
                 auto nbrs = neighbors_(current);
                 if (nbrs.empty()) continue;
 
-                std::uniform_int_distribution<> dist(0, nbrs.size() - 1);
+                std::uniform_int_distribution<> dist(0, (int)nbrs.size() - 1);
                 State nbr = nbrs[dist(rng_)];
                 double nbr_energy = energy_eval(nbr);
 
@@ -694,6 +712,19 @@ public:
                             return result;
                         }
                     }
+                }
+            }
+
+            // Anytime check: timeout budget
+            if (config.timeout_ms > 0) {
+                auto now = std::chrono::high_resolution_clock::now();
+                double elapsed = std::chrono::duration<double, std::milli>(now - start_time).count();
+                if (elapsed >= config.timeout_ms) {
+                    result.timeout_reached = true;
+                    if (config.verbose) {
+                        std::cout << "⏱️ SA TIMEOUT REACHED at " << elapsed << "ms\n";
+                    }
+                    break;
                 }
             }
         }

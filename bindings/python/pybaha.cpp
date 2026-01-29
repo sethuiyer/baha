@@ -27,7 +27,8 @@ PYBIND11_MODULE(pybaha, m) {
         .def_readwrite("max_branches", &BranchAwareOptimizer<PyState>::Config::max_branches)
         .def_readwrite("samples_per_beta", &BranchAwareOptimizer<PyState>::Config::samples_per_beta)
         .def_readwrite("verbose", &BranchAwareOptimizer<PyState>::Config::verbose)
-        .def_readwrite("schedule_type", &BranchAwareOptimizer<PyState>::Config::schedule_type);
+        .def_readwrite("schedule_type", &BranchAwareOptimizer<PyState>::Config::schedule_type)
+        .def_readwrite("timeout_ms", &BranchAwareOptimizer<PyState>::Config::timeout_ms);
 
     py::class_<BranchAwareOptimizer<PyState>::Result>(m, "Result")
         .def_readonly("best_state", &BranchAwareOptimizer<PyState>::Result::best_state)
@@ -36,7 +37,8 @@ PYBIND11_MODULE(pybaha, m) {
         .def_readonly("branch_jumps", &BranchAwareOptimizer<PyState>::Result::branch_jumps)
         .def_readonly("beta_at_solution", &BranchAwareOptimizer<PyState>::Result::beta_at_solution)
         .def_readonly("steps_taken", &BranchAwareOptimizer<PyState>::Result::steps_taken)
-        .def_readonly("time_ms", &BranchAwareOptimizer<PyState>::Result::time_ms);
+        .def_readonly("time_ms", &BranchAwareOptimizer<PyState>::Result::time_ms)
+        .def_readonly("timeout_reached", &BranchAwareOptimizer<PyState>::Result::timeout_reached);
 
     py::class_<BranchAwareOptimizer<PyState>>(m, "Optimizer")
         .def(py::init<
