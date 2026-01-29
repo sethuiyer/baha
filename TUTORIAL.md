@@ -255,10 +255,11 @@ BAHA has several parameters to handle different landscape types:
 | `fracture_threshold` | 1.5 | Decrease (e.g. 1.1) to make the jump logic more aggressive. |
 | `max_branches` | 5 | Increase if the landscape has many "shattered" clusters (e.g. SAT). |
 | `schedule_type` | `LINEAR` | Use `GEOMETRIC` for problems with exponential energy ranges. |
+| `timeout_ms` | -1.0 | Set a positive value (e.g. 5000.0) for a strict time budget. |
 
 ---
 
-## 📊 6. Interpreting the Results
+## 📊 9. Interpreting the Results
 
 The `Result` object tells you *how* BAHA solved the problem:
 
@@ -266,6 +267,7 @@ The `Result` object tells you *how* BAHA solved the problem:
 - **`fractures_detected`**: How many times the landscape "broke" (high stress).
 - **`branch_jumps`**: How many times BAHA used the Riemann surface to teleport to a new basin.
 - **`time_ms`**: Total solve time in milliseconds.
+- **`timeout_reached`**: Boolean flag indicating if the search stopped due to the time budget.
 
 ---
 
