@@ -144,6 +144,54 @@ inline double log_sum_exp_simd(const std::vector<double>& log_terms) {
 }
 
 // =============================================================================
+// PRIME SIEVE UTILITY (for physics-based energy weighting)
+// =============================================================================
+// Weight = log(p² / (p-1)) creates unique energy gaps based on prime structure.
+// From Casimir-like repulsion physics in discrete optimization.
+
+class PrimeSieve {
+public:
+    // Generate first n primes
+    static std::vector<int> generate(int n) {
+        if (n <= 0) return {};
+        
+        // Upper bound for nth prime: p_n < n * (ln(n) + ln(ln(n))) for n >= 6
+        int upper = n < 6 ? 15 : static_cast<int>(n * (std::log(n) + std::log(std::log(n))) * 1.3);
+        
+        std::vector<bool> sieve(upper + 1, true);
+        sieve[0] = sieve[1] = false;
+        
+        for (int p = 2; p * p <= upper; ++p) {
+            if (sieve[p]) {
+                for (int i = p * p; i <= upper; i += p) {
+                    sieve[i] = false;
+                }
+            }
+        }
+        
+        std::vector<int> primes;
+        primes.reserve(n);
+        for (int i = 2; i <= upper && (int)primes.size() < n; ++i) {
+            if (sieve[i]) primes.push_back(i);
+        }
+        return primes;
+    }
+    
+    // Compute log(p² / (p-1)) weights for n elements
+    // Physics: Creates unique energy gaps from prime structure
+    static std::vector<double> log_prime_weights(int n) {
+        auto primes = generate(n);
+        std::vector<double> weights(n);
+        for (int i = 0; i < n; ++i) {
+            double p = static_cast<double>(primes[i]);
+            // Weight = log(p² / (p-1))
+            weights[i] = std::log((p * p) / (p - 1.0));
+        }
+        return weights;
+    }
+};
+
+// =============================================================================
 // OPTIMIZED LAMBERT-W FUNCTION
 // =============================================================================
 
@@ -755,6 +803,780 @@ private:
     SamplerFn sampler_;
     NeighborFn neighbors_;
     std::mt19937 rng_;
+}; // End SimulatedAnnealing
+
+// =============================================================================
+// CONTINUOUS OPTIMIZER (ADAFACTOR / GRADIENT DESCENT)
+// =============================================================================
+
+class AdafactorOptimizer {
+public:
+    using State = std::vector<double>;
+    using EnergyFn = std::function<double(const State&)>;
+    using GradientFn = std::function<State(const State&)>;
+    
+    struct Config {
+        double learning_rate = 0.01;
+        double beta2 = 0.999;     
+        double epsilon = 1e-8;    
+        int steps = 1000;
+        double clip_threshold = 1.0;
+        bool verbose = false;
+        double timeout_ms = -1.0;
+    };
+    
+    struct Result {
+        State best_state;
+        double best_energy;
+        double time_ms;
+        int steps_taken;
+        bool timeout_reached = false;
+    };
+    
+    AdafactorOptimizer(EnergyFn energy, GradientFn gradient, State initial_state)
+        : energy_(std::move(energy)), 
+          gradient_(std::move(gradient)),
+          current_state_(std::move(initial_state)) {}
+          
+    // Overload to avoid default argument complexity in header-only class
+    Result optimize() {
+        return optimize(Config()); 
+    }
+
+    Result optimize(const Config& config) {
+        auto start_time = std::chrono::high_resolution_clock::now();
+        Result result;
+        
+        State v(current_state_.size(), 0.0);
+        
+        result.best_state = current_state_;
+        result.best_energy = energy_(current_state_);
+        
+        for (int t = 1; t <= config.steps; ++t) {
+            State g = gradient_(current_state_);
+            
+            for (size_t i = 0; i < current_state_.size(); ++i) {
+                double g_val = g[i];
+                v[i] = config.beta2 * v[i] + (1.0 - config.beta2) * g_val * g_val;
+                double step_size = config.learning_rate / (std::sqrt(v[i]) + config.epsilon);
+                current_state_[i] -= step_size * g_val;
+                if (current_state_[i] < 0.001) current_state_[i] = 0.001;
+                if (current_state_[i] > 0.999) current_state_[i] = 0.999;
+            }
+            
+            double E = energy_(current_state_);
+            if (E < result.best_energy) {
+                result.best_energy = E;
+                result.best_state = current_state_;
+            }
+            
+            if (config.timeout_ms > 0 && t % 100 == 0) {
+                 auto now = std::chrono::high_resolution_clock::now();
+                 double elapsed = std::chrono::duration<double, std::milli>(now - start_time).count();
+                 if (elapsed >= config.timeout_ms) {
+                     result.timeout_reached = true;
+                     result.steps_taken = t;
+                     result.time_ms = elapsed;
+                     return result;
+                 }
+            }
+        }
+        
+        auto end_time = std::chrono::high_resolution_clock::now();
+        result.time_ms = std::chrono::duration<double, std::milli>(end_time - start_time).count();
+        result.steps_taken = config.steps;
+        
+        return result;
+    }
+
+private:
+    EnergyFn energy_;
+    GradientFn gradient_;
+    State current_state_;
+};
+
+// =============================================================================
+// ZETA BREATHER OPTIMIZER (Default High-Performance Engine)
+// =============================================================================
+// Combines oscillating continuous relaxation with discrete MCMC polish.
+// This is the recommended optimizer for hard constraint satisfaction problems.
+
+template<typename DiscreteState>
+class ZetaBreatherOptimizer {
+public:
+    using ContinuousState = std::vector<double>;
+    using DiscreteEnergyFn = std::function<double(const DiscreteState&)>;
+    using DiscreteNeighborFn = std::function<std::vector<DiscreteState>(const DiscreteState&)>;
+    using DiscreteSamplerFn = std::function<DiscreteState()>;
+    using EncodeFn = std::function<ContinuousState(const DiscreteState&)>;
+    using DecodeFn = std::function<DiscreteState(const ContinuousState&)>;
+    using ContinuousEnergyFn = std::function<double(const ContinuousState&, double beta)>;
+    using ContinuousGradientFn = std::function<ContinuousState(const ContinuousState&, double beta)>;
+    
+    struct Config {
+        double beta_min = 0.5;
+        double beta_max = 1.5;
+        int period = 2000;
+        int total_steps = 10000;
+        int chunk_size = 100;
+        int polish_steps = 20;
+        int polish_samples = 5;
+        double learning_rate = 0.01;
+        double timeout_ms = -1.0;
+        bool verbose = false;
+    };
+    
+    struct Result {
+        DiscreteState best_state;
+        double best_energy;
+        double time_ms;
+        int steps_taken;
+        int peaks_harvested;
+        bool timeout_reached = false;
+    };
+    
+    ZetaBreatherOptimizer(
+        DiscreteEnergyFn discrete_energy,
+        DiscreteSamplerFn sampler,
+        DiscreteNeighborFn neighbors,
+        EncodeFn encode,
+        DecodeFn decode,
+        ContinuousEnergyFn continuous_energy,
+        ContinuousGradientFn continuous_gradient
+    ) : discrete_energy_(std::move(discrete_energy)),
+        sampler_(std::move(sampler)),
+        neighbors_(std::move(neighbors)),
+        encode_(std::move(encode)),
+        decode_(std::move(decode)),
+        continuous_energy_(std::move(continuous_energy)),
+        continuous_gradient_(std::move(continuous_gradient)) {}
+    
+    Result optimize(const Config& config = Config()) {
+        auto start_time = std::chrono::high_resolution_clock::now();
+        Result result;
+        result.peaks_harvested = 0;
+        
+        // Initialize from discrete sampler, then encode
+        DiscreteState best_discrete = sampler_();
+        result.best_energy = discrete_energy_(best_discrete);
+        result.best_state = best_discrete;
+        
+        ContinuousState x = encode_(best_discrete);
+        
+        // Adafactor state
+        std::vector<double> v(x.size(), 0.0);
+        
+        double current_beta = 1.0;
+        bool was_at_peak = false;
+        
+        for (int t = 0; t < config.total_steps; ++t) {
+            // Oscillate Beta
+            double phase = (double)(t % config.period) / (double)config.period * 6.28318;
+            current_beta = 0.5 * (config.beta_min + config.beta_max) + 
+                           0.5 * (config.beta_max - config.beta_min) * std::sin(phase);
+            
+            // Adafactor step
+            ContinuousState g = continuous_gradient_(x, current_beta);
+            for (size_t i = 0; i < x.size(); ++i) {
+                double g_val = g[i];
+                v[i] = 0.999 * v[i] + 0.001 * g_val * g_val;
+                double step = config.learning_rate / (std::sqrt(v[i]) + 1e-8);
+                x[i] -= step * g_val;
+                if (x[i] < 0.001) x[i] = 0.001;
+                if (x[i] > 0.999) x[i] = 0.999;
+            }
+            
+            // Check for peak (Beta > threshold)
+            bool at_peak = (current_beta > config.beta_max - 0.05);
+            
+            if (at_peak && !was_at_peak) {
+                // HARVEST: Decode and Polish
+                DiscreteState s = decode_(x);
+                
+                // Quick MCMC Polish using BranchAwareOptimizer
+                BranchAwareOptimizer<DiscreteState> mcmc(
+                    discrete_energy_, 
+                    [&]() { return s; }, 
+                    neighbors_
+                );
+                typename BranchAwareOptimizer<DiscreteState>::Config mconf;
+                mconf.beta_start = 5.0;
+                mconf.beta_end = 5.0;
+                mconf.beta_steps = config.polish_steps;
+                mconf.samples_per_beta = config.polish_samples;
+                mconf.verbose = false;
+                
+                auto mres = mcmc.optimize(mconf);
+                s = mres.best_state;
+                double e = discrete_energy_(s);
+                
+                if (e < result.best_energy) {
+                    result.best_energy = e;
+                    result.best_state = s;
+                    if (config.verbose) {
+                        std::cout << " [Zeta] Step " << t << " | Beta " << current_beta 
+                                  << " | New Best: " << e << "\n";
+                    }
+                }
+                result.peaks_harvested++;
+            }
+            was_at_peak = at_peak;
+            
+            // Timeout check
+            if (config.timeout_ms > 0 && t % 100 == 0) {
+                auto now = std::chrono::high_resolution_clock::now();
+                double elapsed = std::chrono::duration<double, std::milli>(now - start_time).count();
+                if (elapsed >= config.timeout_ms) {
+                    result.timeout_reached = true;
+                    result.steps_taken = t;
+                    result.time_ms = elapsed;
+                    return result;
+                }
+            }
+        }
+        
+        auto end_time = std::chrono::high_resolution_clock::now();
+        result.time_ms = std::chrono::duration<double, std::milli>(end_time - start_time).count();
+        result.steps_taken = config.total_steps;
+        
+        return result;
+    }
+
+private:
+    DiscreteEnergyFn discrete_energy_;
+    DiscreteSamplerFn sampler_;
+    DiscreteNeighborFn neighbors_;
+    EncodeFn encode_;
+    DecodeFn decode_;
+    ContinuousEnergyFn continuous_energy_;
+    ContinuousGradientFn continuous_gradient_;
+};
+
+// =============================================================================
+// AUTO ZETA OPTIMIZER (Physics-Based Auto-Relaxation)
+// =============================================================================
+// Automatically generates continuous relaxation from discrete energy using:
+// 1. Softmax encode (discrete → continuous probabilities)
+// 2. log(p²/(p-1)) weighted repulsion energy
+// 3. Numerical gradient via finite differences
+//
+// No user-provided encode/decode/continuous functions required!
+
+template<typename DiscreteState>
+class AutoZetaOptimizer {
+public:
+    using DiscreteEnergyFn = std::function<double(const DiscreteState&)>;
+    using DiscreteNeighborFn = std::function<std::vector<DiscreteState>(const DiscreteState&)>;
+    using DiscreteSamplerFn = std::function<DiscreteState()>;
+    
+    struct Config {
+        double beta_min = 0.5;
+        double beta_max = 1.5;
+        int period = 2000;
+        int total_steps = 10000;
+        int polish_steps = 20;
+        int polish_samples = 10;
+        double learning_rate = 0.01;
+        double grad_eps = 0.01;  // Finite difference epsilon
+        double timeout_ms = -1.0;
+        bool verbose = false;
+    };
+    
+    struct Result {
+        DiscreteState best_state;
+        double best_energy;
+        double time_ms;
+        int steps_taken;
+        int peaks_harvested;
+        bool timeout_reached = false;
+    };
+    
+    AutoZetaOptimizer(
+        DiscreteEnergyFn discrete_energy,
+        DiscreteSamplerFn sampler,
+        DiscreteNeighborFn neighbors,
+        int domain_size  // K = number of values each variable can take
+    ) : discrete_energy_(std::move(discrete_energy)),
+        sampler_(std::move(sampler)),
+        neighbors_(std::move(neighbors)),
+        domain_size_(domain_size) {
+        // Pre-compute prime weights for up to 1000 buckets
+        prime_weights_ = PrimeSieve::log_prime_weights(1000);
+    }
+    
+    Result optimize(const Config& config = Config()) {
+        auto start_time = std::chrono::high_resolution_clock::now();
+        Result result;
+        result.peaks_harvested = 0;
+        result.timeout_reached = false;
+        
+        // Sample discrete state to learn structure
+        DiscreteState init_state = sampler_();
+        int n = get_state_size(init_state);
+        int K = domain_size_;
+        
+        result.best_state = init_state;
+        result.best_energy = discrete_energy_(init_state);
+        
+        if (config.verbose) {
+            std::cout << "[AutoZeta] State size: " << n << ", Domain: " << K << "\n";
+        }
+        
+        // Continuous state: n*K values (softmax logits)
+        std::vector<double> x(n * K, 0.0);
+        
+        // Initialize from discrete state
+        encode_state(init_state, x, K);
+        
+        // Adafactor state
+        std::vector<double> v(x.size(), 0.0);
+        
+        double current_beta = 1.0;
+        bool was_at_peak = false;
+        
+        for (int t = 0; t < config.total_steps; ++t) {
+            // Check timeout
+            if (config.timeout_ms > 0) {
+                auto now = std::chrono::high_resolution_clock::now();
+                double elapsed = std::chrono::duration<double, std::milli>(now - start_time).count();
+                if (elapsed > config.timeout_ms) {
+                    result.timeout_reached = true;
+                    break;
+                }
+            }
+            
+            // Oscillate Beta
+            double phase = (double)(t % config.period) / (double)config.period * 6.28318;
+            current_beta = 0.5 * (config.beta_min + config.beta_max) + 
+                           0.5 * (config.beta_max - config.beta_min) * std::sin(phase);
+            
+            // Compute gradient via finite differences
+            std::vector<double> grad(x.size(), 0.0);
+            double base_energy = continuous_energy(x, current_beta, K);
+            
+            for (size_t i = 0; i < x.size(); ++i) {
+                double orig = x[i];
+                x[i] = orig + config.grad_eps;
+                double e_plus = continuous_energy(x, current_beta, K);
+                x[i] = orig;
+                grad[i] = (e_plus - base_energy) / config.grad_eps;
+            }
+            
+            // Adafactor update
+            for (size_t i = 0; i < x.size(); ++i) {
+                double g_val = grad[i];
+                v[i] = 0.999 * v[i] + 0.001 * g_val * g_val;
+                double step = config.learning_rate / (std::sqrt(v[i]) + 1e-8);
+                x[i] -= step * g_val;
+            }
+            
+            // Check for peak
+            bool at_peak = (current_beta > config.beta_max - 0.05);
+            
+            if (at_peak && !was_at_peak) {
+                // HARVEST: Decode and Polish
+                DiscreteState s = decode_state(x, K, n);
+                
+                // Quick MCMC Polish
+                BranchAwareOptimizer<DiscreteState> mcmc(
+                    discrete_energy_, 
+                    [&]() { return s; }, 
+                    neighbors_
+                );
+                typename BranchAwareOptimizer<DiscreteState>::Config mcmc_conf;
+                mcmc_conf.beta_start = 0.5;
+                mcmc_conf.beta_end = 2.0;
+                mcmc_conf.beta_steps = config.polish_steps;
+                mcmc_conf.samples_per_beta = config.polish_samples;
+                mcmc_conf.verbose = false;
+                
+                auto polish_result = mcmc.optimize(mcmc_conf);
+                result.peaks_harvested++;
+                
+                if (polish_result.best_energy < result.best_energy) {
+                    result.best_state = polish_result.best_state;
+                    result.best_energy = polish_result.best_energy;
+                    
+                    if (config.verbose) {
+                        std::cout << "[AutoZeta] Peak " << result.peaks_harvested 
+                                  << ": E=" << result.best_energy << "\n";
+                    }
+                }
+                
+                // Re-encode best state
+                encode_state(result.best_state, x, K);
+            }
+            
+            was_at_peak = at_peak;
+        }
+        
+        auto end_time = std::chrono::high_resolution_clock::now();
+        result.time_ms = std::chrono::duration<double, std::milli>(end_time - start_time).count();
+        result.steps_taken = config.total_steps;
+        
+        return result;
+    }
+
+private:
+    DiscreteEnergyFn discrete_energy_;
+    DiscreteSamplerFn sampler_;
+    DiscreteNeighborFn neighbors_;
+    int domain_size_;
+    std::vector<double> prime_weights_;
+    
+    // Get state size (assuming vector-like discrete state)
+    template<typename T = DiscreteState>
+    typename std::enable_if<std::is_same<T, std::vector<int>>::value || 
+                           std::is_same<T, std::vector<typename T::value_type>>::value, int>::type
+    get_state_size(const T& s) { return static_cast<int>(s.size()); }
+    
+    // Softmax encode: discrete state → continuous logits
+    template<typename T = DiscreteState>
+    typename std::enable_if<std::is_same<T, std::vector<int>>::value || 
+                           std::is_same<T, std::vector<typename T::value_type>>::value, void>::type
+    encode_state(const T& s, std::vector<double>& x, int K) {
+        int n = static_cast<int>(s.size());
+        x.assign(n * K, -1.0);  // Initialize cold
+        for (int i = 0; i < n; ++i) {
+            int val = static_cast<int>(s[i]);
+            if (val >= 0 && val < K) {
+                x[i * K + val] = 1.0;  // Hot for selected value
+            }
+        }
+    }
+    
+    // Argmax decode: continuous logits → discrete state
+    template<typename T = DiscreteState>
+    typename std::enable_if<std::is_same<T, std::vector<int>>::value, T>::type
+    decode_state(const std::vector<double>& x, int K, int n) {
+        T s(n);
+        for (int i = 0; i < n; ++i) {
+            int best_k = 0;
+            double best_val = x[i * K];
+            for (int k = 1; k < K; ++k) {
+                if (x[i * K + k] > best_val) {
+                    best_val = x[i * K + k];
+                    best_k = k;
+                }
+            }
+            s[i] = best_k;
+        }
+        return s;
+    }
+    
+    // Continuous energy with log(p²/(p-1)) weighted repulsion
+    double continuous_energy(const std::vector<double>& x, double beta, int K) {
+        int n = static_cast<int>(x.size()) / K;
+        
+        // Convert logits to softmax probabilities
+        std::vector<std::vector<double>> probs(n, std::vector<double>(K));
+        for (int i = 0; i < n; ++i) {
+            double max_logit = x[i * K];
+            for (int k = 1; k < K; ++k) {
+                max_logit = std::max(max_logit, x[i * K + k]);
+            }
+            double sum_exp = 0.0;
+            for (int k = 0; k < K; ++k) {
+                probs[i][k] = std::exp(beta * (x[i * K + k] - max_logit));
+                sum_exp += probs[i][k];
+            }
+            for (int k = 0; k < K; ++k) {
+                probs[i][k] /= sum_exp;
+            }
+        }
+        
+        // Compute weighted discrete energy by sampling
+        // Use the current soft assignment to weight discrete evaluations
+        DiscreteState s = decode_state_from_probs(probs, n, K);
+        double base_e = discrete_energy_(s);
+        
+        // Weight by bucket using log(p²/(p-1))
+        int bucket = static_cast<int>(99.0 * (1.0 - 1.0 / std::log2(base_e + 2.0)));
+        bucket = std::max(0, std::min(999, bucket));
+        
+        return base_e * prime_weights_[bucket];
+    }
+    
+    // Decode from softmax probabilities (sample argmax)
+    DiscreteState decode_state_from_probs(const std::vector<std::vector<double>>& probs, int n, int K) {
+        DiscreteState s;
+        s.resize(n);
+        for (int i = 0; i < n; ++i) {
+            int best_k = 0;
+            double best_p = probs[i][0];
+            for (int k = 1; k < K; ++k) {
+                if (probs[i][k] > best_p) {
+                    best_p = probs[i][k];
+                    best_k = k;
+                }
+            }
+            s[i] = best_k;
+        }
+        return s;
+    }
+};
+
+// =============================================================================
+// ADAPTIVE OPTIMIZER (Auto-Switching Engine)
+// =============================================================================
+// Automatically switches between BranchAwareOptimizer and ZetaBreatherOptimizer
+// based on fracture density: if fractures/steps > threshold → use BranchAware
+// (fracture-rich landscape), else use Zeta (smooth landscape).
+
+template<typename DiscreteState>
+class AdaptiveOptimizer {
+public:
+    using ContinuousState = std::vector<double>;
+    using DiscreteEnergyFn = std::function<double(const DiscreteState&)>;
+    using DiscreteNeighborFn = std::function<std::vector<DiscreteState>(const DiscreteState&)>;
+    using DiscreteSamplerFn = std::function<DiscreteState()>;
+    using EncodeFn = std::function<ContinuousState(const DiscreteState&)>;
+    using DecodeFn = std::function<DiscreteState(const ContinuousState&)>;
+    using ContinuousEnergyFn = std::function<double(const ContinuousState&, double)>;
+    using ContinuousGradientFn = std::function<ContinuousState(const ContinuousState&, double)>;
+    
+    struct Config {
+        // Fracture density threshold for switching
+        double fracture_threshold = 0.3;  // fractures/steps > this → BranchAware
+        
+        // Probe phase config (quick probe to detect fracture density)
+        int probe_steps = 100;
+        int probe_samples = 10;
+        
+        // BranchAware config (for fracture-rich landscapes)
+        double ba_beta_start = 0.1;
+        double ba_beta_end = 20.0;
+        int ba_beta_steps = 200;        // Optimized for performance
+        int ba_samples_per_beta = 50;   // Proven on N=100 Queens
+        int ba_max_branches = 8;
+        
+        // Zeta config (for smooth landscapes)
+        double zeta_beta_min = 0.5;
+        double zeta_beta_max = 1.5;
+        int zeta_period = 2000;
+        int zeta_total_steps = 10000;
+        int zeta_polish_steps = 100;
+        int zeta_polish_samples = 32;
+        double zeta_learning_rate = 0.01;
+        
+        double timeout_ms = -1.0;
+        bool verbose = false;
+    };
+    
+    struct Result {
+        DiscreteState best_state;
+        double best_energy;
+        double time_ms;
+        int steps_taken;
+        int fractures_detected;
+        double fracture_density;
+        bool used_branch_aware;  // true if switched to BranchAware
+        bool timeout_reached = false;
+    };
+    
+    AdaptiveOptimizer(
+        DiscreteEnergyFn discrete_energy,
+        DiscreteSamplerFn sampler,
+        DiscreteNeighborFn neighbors,
+        EncodeFn encode = nullptr,
+        DecodeFn decode = nullptr,
+        ContinuousEnergyFn continuous_energy = nullptr,
+        ContinuousGradientFn continuous_gradient = nullptr
+    ) : discrete_energy_(std::move(discrete_energy)),
+        sampler_(std::move(sampler)),
+        neighbors_(std::move(neighbors)),
+        encode_(std::move(encode)),
+        decode_(std::move(decode)),
+        continuous_energy_(std::move(continuous_energy)),
+        continuous_gradient_(std::move(continuous_gradient)) {}
+    
+    Result optimize(const Config& config = Config()) {
+        auto start_time = std::chrono::high_resolution_clock::now();
+        Result result;
+        
+        // =====================================================================
+        // PHASE 1: PROBE - Quick BranchAware run to detect fracture density
+        // =====================================================================
+        if (config.verbose) {
+            std::cout << "[Adaptive] Starting probe phase (" << config.probe_steps << " steps)...\n";
+        }
+        
+        BranchAwareOptimizer<DiscreteState> probe(discrete_energy_, sampler_, neighbors_);
+        typename BranchAwareOptimizer<DiscreteState>::Config probe_conf;
+        probe_conf.beta_start = 0.01;
+        probe_conf.beta_end = 5.0;
+        probe_conf.beta_steps = config.probe_steps;
+        probe_conf.samples_per_beta = config.probe_samples;
+        probe_conf.verbose = false;
+        
+        auto probe_result = probe.optimize(probe_conf);
+        
+        double fracture_density = (double)probe_result.fractures_detected / (double)config.probe_steps;
+        result.fracture_density = fracture_density;
+        result.fractures_detected = probe_result.fractures_detected;
+        result.best_state = probe_result.best_state;
+        result.best_energy = probe_result.best_energy;
+        
+        if (config.verbose) {
+            std::cout << "[Adaptive] Probe: " << probe_result.fractures_detected 
+                      << " fractures in " << config.probe_steps << " steps"
+                      << " (density=" << fracture_density << ")\n";
+        }
+        
+        // =====================================================================
+        // PHASE 2: DECISION - Choose optimizer based on fracture density
+        // =====================================================================
+        if (fracture_density > config.fracture_threshold) {
+            // Fracture-rich → BranchAwareOptimizer
+            result.used_branch_aware = true;
+            
+            if (config.verbose) {
+                std::cout << "[Adaptive] Density " << fracture_density 
+                          << " > " << config.fracture_threshold 
+                          << " → Using BranchAwareOptimizer\n";
+            }
+            
+            BranchAwareOptimizer<DiscreteState> ba(
+                discrete_energy_, 
+                [&]() { return result.best_state; },  // Start from probe's best
+                neighbors_
+            );
+            typename BranchAwareOptimizer<DiscreteState>::Config ba_conf;
+            ba_conf.beta_start = config.ba_beta_start;
+            ba_conf.beta_end = config.ba_beta_end;
+            ba_conf.beta_steps = config.ba_beta_steps;
+            ba_conf.samples_per_beta = config.ba_samples_per_beta;
+            ba_conf.max_branches = config.ba_max_branches;
+            ba_conf.verbose = config.verbose;
+            ba_conf.timeout_ms = config.timeout_ms > 0 ? 
+                config.timeout_ms - probe_result.time_ms : -1.0;
+            
+            auto ba_result = ba.optimize(ba_conf);
+            
+            if (ba_result.best_energy < result.best_energy) {
+                result.best_state = ba_result.best_state;
+                result.best_energy = ba_result.best_energy;
+            }
+            result.fractures_detected += ba_result.fractures_detected;
+            result.steps_taken = config.probe_steps + ba_result.steps_taken;
+            result.timeout_reached = ba_result.timeout_reached;
+            
+        } else {
+            // Smooth landscape → ZetaBreatherOptimizer (if continuous functions available)
+            result.used_branch_aware = false;
+            
+            if (encode_ && decode_ && continuous_energy_ && continuous_gradient_) {
+                if (config.verbose) {
+                    std::cout << "[Adaptive] Density " << fracture_density 
+                              << " <= " << config.fracture_threshold 
+                              << " → Using ZetaBreatherOptimizer\n";
+                }
+                
+                ZetaBreatherOptimizer<DiscreteState> zeta(
+                    discrete_energy_, 
+                    [&]() { return result.best_state; },
+                    neighbors_,
+                    encode_, decode_,
+                    continuous_energy_, continuous_gradient_
+                );
+                typename ZetaBreatherOptimizer<DiscreteState>::Config zeta_conf;
+                zeta_conf.beta_min = config.zeta_beta_min;
+                zeta_conf.beta_max = config.zeta_beta_max;
+                zeta_conf.period = config.zeta_period;
+                zeta_conf.total_steps = config.zeta_total_steps;
+                zeta_conf.polish_steps = config.zeta_polish_steps;
+                zeta_conf.polish_samples = config.zeta_polish_samples;
+                zeta_conf.learning_rate = config.zeta_learning_rate;
+                zeta_conf.verbose = config.verbose;
+                zeta_conf.timeout_ms = config.timeout_ms > 0 ? 
+                    config.timeout_ms - probe_result.time_ms : -1.0;
+                
+                auto zeta_result = zeta.optimize(zeta_conf);
+                
+                if (zeta_result.best_energy < result.best_energy) {
+                    result.best_state = zeta_result.best_state;
+                    result.best_energy = zeta_result.best_energy;
+                }
+                result.steps_taken = config.probe_steps + zeta_result.steps_taken;
+                result.timeout_reached = zeta_result.timeout_reached;
+                
+            } else {
+                // =============================================================
+                // AUTO-RELAXATION: Use 1/log(prime) weighted energy
+                // =============================================================
+                // Physics insight: Weight the discrete energy by 1/log(prime)
+                // to create unique energy gaps that break symmetry.
+                // This makes the landscape smoother and easier to optimize.
+                
+                if (config.verbose) {
+                    std::cout << "[Adaptive] Low density + no continuous funcs → "
+                              << "Using 1/log(prime) weighted BranchAware\n";
+                }
+                
+                // Generate prime weights for energy modulation
+                // The weight oscillates based on current energy level
+                auto prime_weights = PrimeSieve::log_prime_weights(100);
+                
+                // Create weighted energy function
+                auto weighted_energy = [this, &prime_weights](const DiscreteState& s) -> double {
+                    double base_e = discrete_energy_(s);
+                    if (base_e <= 0) return base_e;  // Already optimal
+                    
+                    // Log-scale mapping: map energy to bucket 0-99
+                    // bucket = 99 * (1 - 1/log2(e+2)) → lower energy = lower bucket = larger weight
+                    double log_e = std::log2(base_e + 2.0);
+                    int bucket = static_cast<int>(99.0 * (1.0 - 1.0 / log_e));
+                    bucket = std::max(0, std::min(99, bucket));
+                    
+                    double weight = prime_weights[bucket];
+                    return base_e * weight;
+                };
+                
+                result.used_branch_aware = true;
+                
+                BranchAwareOptimizer<DiscreteState> ba(
+                    weighted_energy,  // Use weighted energy instead!
+                    [&]() { return result.best_state; },
+                    neighbors_
+                );
+                typename BranchAwareOptimizer<DiscreteState>::Config ba_conf;
+                ba_conf.beta_start = config.ba_beta_start;
+                ba_conf.beta_end = config.ba_beta_end;
+                ba_conf.beta_steps = config.ba_beta_steps;
+                ba_conf.samples_per_beta = config.ba_samples_per_beta;
+                ba_conf.max_branches = config.ba_max_branches;
+                ba_conf.verbose = config.verbose;
+                ba_conf.timeout_ms = config.timeout_ms > 0 ? 
+                    config.timeout_ms - probe_result.time_ms : -1.0;
+                
+                auto ba_result = ba.optimize(ba_conf);
+                
+                // Recalculate true energy (unweighted)
+                double true_energy = discrete_energy_(ba_result.best_state);
+                if (true_energy < result.best_energy) {
+                    result.best_state = ba_result.best_state;
+                    result.best_energy = true_energy;
+                }
+                result.fractures_detected += ba_result.fractures_detected;
+                result.steps_taken = config.probe_steps + ba_result.steps_taken;
+                result.timeout_reached = ba_result.timeout_reached;
+            }
+        }
+        
+        auto end_time = std::chrono::high_resolution_clock::now();
+        result.time_ms = std::chrono::duration<double, std::milli>(end_time - start_time).count();
+        
+        return result;
+    }
+
+private:
+    DiscreteEnergyFn discrete_energy_;
+    DiscreteSamplerFn sampler_;
+    DiscreteNeighborFn neighbors_;
+    EncodeFn encode_;
+    DecodeFn decode_;
+    ContinuousEnergyFn continuous_energy_;
+    ContinuousGradientFn continuous_gradient_;
 };
 
 } // namespace navokoj

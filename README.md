@@ -45,27 +45,72 @@ def energy(state): return count_conflicts(state)
 # 2. Define Moves
 def neighbors(state): return [swap_two_queens(state) for _ in range(10)]
 
-# 3. Solve
-opt = pybaha.Optimizer(energy, random_sampler, neighbors)
-result = opt.optimize(pybaha.Config(timeout_ms=5000))
+# 3. Solve with one line!
+result = pybaha.optimize(energy, random_sampler, neighbors)
 
-print(f"Result: {result.best_state}")
-# ⚡ Fractures Detected: 5 | 🔀 Jumps: 1
+print(f"Result: {result.best_state}, Energy: {result.best_energy}")
+# ⚡ Fracture Density: 0.92 | Time: 345ms
 ```
 
----
+### 🔮 ZetaOptimizer (High-Performance Hybrid)
 
-## Proven Results
+For problems with expensive energy functions, use `ZetaOptimizer` which oscillates between continuous relaxation and discrete MCMC polish:
 
-BAHA isn't just theory. It dominates on structured combinatorial problems.
+```python
+import pybaha
 
-Some of the noteworthy results are:
+# ZetaOptimizer requires encode/decode for continuous↔discrete conversion
+opt = pybaha.ZetaOptimizer(
+    discrete_energy, sampler, neighbors,
+    encode, decode, continuous_energy, continuous_gradient
+)
 
-| Benchmark | Result | Notes |
-|-----------|--------|-------|
-| **Ramsey R(5,5,5)** | **N > 52** | Solved 2.6M constraints in <1s. [Verifiable Witness](data/ramsey_52_witness.csv) |
-| **Graph Isomorphism** | **100% Success** | vs 20% for Simulated Annealing (N=50) |
-| **DNA Barcode** | **Perfect (0 Violations)** | First application of fracture-aware optimization to bioinformatics |
+config = pybaha.ZetaConfig()
+config.beta_min = 0.3      # Low beta for exploration
+config.beta_max = 2.0      # High beta for exploitation
+config.period = 500        # Oscillation period
+config.total_steps = 5000
+config.polish_steps = 50   # MCMC polish at each peak
+result = opt.optimize(config)
+```
+
+## Proven Results (26 Problem Domains)
+
+BAHA isn't just theory. **22/26 (84%) pass rate** across diverse optimization domains.
+
+| # | Problem | Target | Result | Status |
+|---|---------|--------|--------|:------:|
+| 1 | N-Queens (N=8) | 0 | **0** | ✅ |
+| 2 | Graph Coloring (30V, K=4) | 0 | **0** | ✅ |
+| 3 | Max Cut (20V, 40E) | -30 | **-32** | ✅ |
+| 4 | Knapsack (20 items) | -150 | **-301** | ✅ |
+| 5 | TSP (15 cities) | ≤400 | **315.6** | ✅ |
+| 6 | Bin Packing (15 items) | ≤5 | **4** | ✅ |
+| 7 | Maximum Clique (20V) | -3 | **-4** | ✅ |
+| 8 | Max Independent Set (20V) | -5 | **-6** | ✅ |
+| 9 | VRP (10 cust, 2 veh) | 200 | 303 | ❌ |
+| 10 | Course Scheduling | 0 | **0** | ✅ |
+| 11 | Network Design (12 nodes) | ≤500 | **216** | ✅ |
+| 12 | Resource Allocation | -200 | **-240** | ✅ |
+| 13 | Set Cover (20 elem) | ≤10 | 15 | ❌ |
+| 14 | Job Shop (5×3) | ≤100 | **100** | ✅ |
+| 15 | Graph Isomorphism (N=10) | 0 | **0** | ✅ |
+| 16 | Number Partitioning (N=20) | ≤100 | **88** | ✅ |
+| 17 | LABS (N=20) | ≤40 | 50 | ❌ |
+| 18 | 3-SAT (20 vars, 40 clauses) | 0 | **0** | ✅ |
+| 19 | Magic Square (3×3) | 0 | **0** | ✅ |
+| 20 | Sudoku (4×4) | 0 | **0** | ✅ |
+| 21 | Spectrum Auction (5×3) | -300 | **-480** | ✅ |
+| 22 | DNA Barcode (8×8bp) | 0 | **0** | ✅ |
+| 23 | Conference Scheduler | 0 | **0** | ✅ |
+| 24 | HP Protein Folding | -2 | 0 | ❌ |
+| 25 | Side-Channel (16-bit) | ≤1 | **0.3** | ✅ |
+| 26 | Ramsey R(3,3) @ N=5 | 0 | **0** | ✅ |
+
+**Highlights:**
+- **Ramsey R(5,5,5) @ N=52**: Solved 2.6M constraints. [Verifiable Witness](data/ramsey_52_witness.csv)
+- **Graph Isomorphism**: 100% success vs 20% for SA (N=50)
+- **All constraint satisfaction** (N-Queens, SAT, Sudoku, Magic Square): Perfect
 
 ---
 
