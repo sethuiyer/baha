@@ -115,6 +115,11 @@ if(BUILD_EXAMPLES)
   add_executable(graph_coloring examples/graph_coloring.cpp)
   target_link_libraries(graph_coloring baha)
   set_property(TARGET graph_coloring PROPERTY CXX_STANDARD 17)
+
+  # Incident response playbook example
+  add_executable(incident_response examples/incident_response.cpp)
+  target_link_libraries(incident_response baha)
+  set_property(TARGET incident_response PROPERTY CXX_STANDARD 17)
 endif()
 
 # Benchmarks

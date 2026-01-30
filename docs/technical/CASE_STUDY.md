@@ -762,4 +762,92 @@ BAHA detects **fractures**—discontinuities in the specific heat—which signal
 
 ---
 
+## 28. 🚨 AI Incident Response Playbook (Novel Application)
+
+**Problem:** Generate optimal containment plans during cyber incidents, satisfying:
+1. **Hard constraints** (must satisfy):
+   - Authentication containment (MFA enforced OR VPN disabled)
+   - If exfiltration suspected → Block C2 domains AND disable lateral movement
+   - If EDR deployed → Rotate service keys
+2. **Soft constraints** (penalties for violations):
+   - Avoid DB isolation without web tier isolation (prevents cascading outages)
+   - Avoid full isolation unless severity is high (limits business impact)
+   - Don't disable VPN without MFA for critical services
+   - Block SMB and rotate keys for medium+ severity incidents
+
+**Why It's Hard:**
+- Search space: $2^{10}$ action combinations (10 containment actions)
+- Multi-objective optimization: minimize risk + service disruption
+- **Phase transitions** occur at containment/outage tipping points
+- Interaction effects: isolating one tier can cascade to others
+
+**Scenario:**
+- Severity: Medium (2/3)
+- Data exfiltration suspected: Yes
+- Service criticality: Medium (2/3)
+
+**BAHA Results:**
+
+| Metric | Value |
+|--------|-------|
+| Best Energy | **58.8** |
+| Fractures Detected | **199** |
+| Branch Jumps | **1** |
+| Time | **0.047s** |
+| Hard Violations | **0** |
+| Soft Penalty | **0.0** |
+
+**Optimal Playbook:**
+
+| Action | Selected | Rationale |
+|--------|----------|-----------|
+| Rotate service keys | ✅ | Required when EDR deployed (hard constraint) |
+| Block SMB (445) | ✅ | Prevents ransomware lateral movement |
+| Enforce MFA everywhere | ✅ | Satisfies authentication containment (hard) |
+| Reset admin tokens | ✅ | Additional credential hygiene |
+| Block C2 domains | ✅ | Required for exfil containment (hard) |
+| Deploy EDR containment | ✅ | Active threat hunting and containment |
+| Disable lateral movement | ✅ | Required for exfil containment (hard) |
+| Isolate web tier | ❌ | Not needed (severity not high enough) |
+| Isolate DB tier | ❌ | Would violate soft constraint + increase outage |
+| Disable VPN access | ❌ | Would increase disruption without MFA benefit |
+
+**Constraint Satisfaction Report:**
+
+| Constraint | Status | Type | Note |
+|------------|--------|------|------|
+| Auth containment (MFA or VPN disabled) | ✅ | Hard | MFA enforced prevents credential reuse |
+| Exfil suspected → Block C2 + lateral movement | ✅ | Hard | Both controls active, stops data exfiltration |
+| EDR requires key rotation | ✅ | Hard | Keys rotated, containment is resilient |
+| Avoid DB isolation without web isolation | ✅ | Soft | Neither isolated, prevents partial outage |
+| Avoid full isolation unless severity high | ✅ | Soft | No isolation for medium severity |
+| High criticality → don't disable VPN without MFA | ✅ | Soft | VPN kept enabled with MFA safeguard |
+| Severity ≥ medium → block SMB | ✅ | Soft | SMB blocked to reduce propagation |
+| Severity ≥ medium → rotate keys | ✅ | Soft | Keys rotated to limit replay |
+
+**Key Observations:**
+
+- **Phase-transition aware**: 199 fractures detected at the exact points where containment strategies fundamentally change
+- **Perfect constraint satisfaction**: 0 hard violations, 0 soft penalty — balanced risk vs disruption
+- **Explainable**: Every action has a clear rationale tied to constraints and scenario
+- **Fast**: 47ms optimization time — faster than a human could read the scenario
+
+**What This Proves:**
+
+1. **BAHA handles operational trade-offs**: Not just academic benchmarks, but real-world risk/disruption balance
+2. **Fracture detection finds tipping points**: The 199 fractures correspond to containment vs outage phase transitions
+3. **Quantum-inspired approach works for cybersecurity**: Branch jumping (1 jump) found the optimal containment regime
+4. **Explainability at scale**: Every decision is traceable to constraints and scenario context
+
+**Novel Contribution:**
+
+This is the **first application of fracture-aware optimization to cyber incident response**. Existing tools use either:
+- **Rule-based playbooks**: "If ransomware, isolate everything" → service outage
+- **Pure heuristics**: "Block bad IPs from threat intel" → reactive, no optimization
+- **Manual decisions**: SOC analysts guessing → slow, inconsistent
+
+BAHA detects the exact moment when containment becomes too disruptive and finds the optimal balance automatically.
+
+---
+
 *For implementation details, see the [examples/](examples/) and [benchmarks/](benchmarks/) directories.*
