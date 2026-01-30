@@ -1579,6 +1579,19 @@ private:
     ContinuousGradientFn continuous_gradient_;
 };
 
+// =============================================================================
+// BACKWARD-COMPATIBLE ALIASES
+// =============================================================================
+// These aliases allow older code/tests to compile without modification.
+
+using LambertW = LambertWOptimized;
+using FractureDetector = FractureDetectorOptimized;
+
+// Alias for log_sum_exp (wraps the SIMD-optimized version)
+inline double log_sum_exp(const std::vector<double>& log_terms) {
+    return log_sum_exp_simd(log_terms);
+}
+
 } // namespace navokoj
 
 #endif // NAVOKOJ_BAHA_HPP

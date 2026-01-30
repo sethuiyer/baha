@@ -19,7 +19,18 @@ cmake .. \
 
 # Build the project
 echo "Building project..."
-make -j$(nproc)
+# Portable parallelism (Linux + macOS)
+JOBS=1
+if command -v nproc >/dev/null 2>&1; then
+    JOBS="$(nproc)"
+elif [ "$(uname -s)" = "Darwin" ] && command -v sysctl >/dev/null 2>&1; then
+    JOBS="$(sysctl -n hw.ncpu)"
+elif command -v getconf >/dev/null 2>&1; then
+    JOBS="$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 1)"
+fi
+
+echo "Using ${JOBS} parallel jobs"
+make -j"${JOBS}"
 
 echo ""
 echo "Build completed successfully!"

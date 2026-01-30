@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "pybind11>=2.10"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pybaha"
+version = "1.0.0"
+description = "Python bindings for BAHA (Branch-Aware Holonomy Annealing)"
+readme = "README.md"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "Sethurathienam Iyer"}
+]
+requires-python = ">=3.7"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: C++",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+keywords = ["optimization", "simulated-annealing", "combinatorial", "constraint-satisfaction"]
+
+[project.urls]
+Homepage = "https://github.com/sethuiyer/baha"
+Repository = "https://github.com/sethuiyer/baha"
+Documentation = "https://github.com/sethuiyer/baha/tree/main/docs"
+
+[tool.setuptools]
+packages = []
+script-files = ["bindings/python/setup.py"]
+
+[tool.setuptools.package-data]
+"*" = ["*.hpp", "*.h", "*.cuh"]
