@@ -43,9 +43,57 @@ Because BAHA is a stochastic heuristic, its **worst‑case** runtime is unbounde
 | GPU acceleration | Offload Monte‑Carlo sampling to CUDA (`baha_gpu.cu`) | Parallelism reduces constant factor of `O(N·S)` |
 | Memory footprint | Keep `S` modest (≤ 200) and reuse vectors | Space stays `O(B+S)` and cache locality improves |
 
+## AdaptiveOptimizer Complexity (`pybaha.optimize()`)
+
+The `AdaptiveOptimizer` (default via `pybaha.optimize()`) adds a probe phase before selecting the optimal engine:
+
+```
+Phase 1: Probe (detect fracture density ρ)
+    → O(probe_steps × probe_samples) = O(100 × 10) = O(1000 evals)
+
+Phase 2: Engine selection based on ρ
+    If ρ > 0.3 (fracture-rich): BranchAwareOptimizer
+        → O(B·N·S) where B=200, S=50 (defaults)
+        
+    If ρ ≤ 0.3 (smooth landscape): ZetaBreatherOptimizer
+        → O(total_steps × K) + O(polish_steps × polish_samples)
+        where K = gradient computation cost
+```
+
+### Default Parameters (AdaptiveOptimizer)
+
+| Parameter | Value | Effect on Complexity |
+|-----------|-------|---------------------|
+| `probe_steps` | 100 | O(100) probe overhead |
+| `probe_samples` | 10 | O(10) samples per probe step |
+| `ba_beta_steps` | 200 | O(200) annealing iterations |
+| `ba_samples_per_beta` | 50 | O(50) MC samples per β |
+| `timeout_ms` | 5000 | Hard cutoff (overrides steps) |
+
+### Per-Problem Complexity Examples
+
+| Problem | Neighbors (N) | Total Evals | Time (empirical) |
+|---------|---------------|-------------|------------------|
+| N-Queens (N=100) | 50 | ~500K | 19-30s |
+| Graph Coloring (30V) | 30 | ~300K | 300ms |
+| 3-SAT (20v, 40c) | 20 | ~200K | 1.1s |
+| Sudoku (4×4) | 20 | ~100K | 5s |
+
+### Timeout vs Steps
+
+When `timeout_ms` is set, the algorithm may terminate before completing all `beta_steps`. The effective complexity becomes:
+
+```
+O(min(B·N·S, timeout_ms × eval_rate))
+```
+
+where `eval_rate` ≈ 10K-100K evals/second depending on energy function cost.
+
 ## Summary
-- **Runtime:** `O(B·N·S)` (linear in schedule length, neighbor count, and Monte‑Carlo samples). 
+- **Runtime:** `O(B·N·S)` (linear in schedule length, neighbor count, and Monte-Carlo samples). 
 - **Space:** `O(B + S)`. 
-- **Problem class:** NP‑hard / NP‑complete. 
-- **Empirical speed‑up:** 2‑3× over vanilla SA on medium‑size discrete benchmarks; larger gains when fractures are frequent. 
+- **Problem class:** NP-hard / NP-complete. 
+- **AdaptiveOptimizer:** Adds O(1000) probe overhead, then routes to optimal engine.
+- **Empirical speed-up:** 2-3× over vanilla SA on medium-size discrete benchmarks; larger gains when fractures are frequent. 
 - **Scalability:** Linear scaling with problem size; can be accelerated via parallel sampling and smarter neighbor generation.
+
