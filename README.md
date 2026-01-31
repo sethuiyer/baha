@@ -147,18 +147,151 @@ For deep technical details, theory, and C++ API reference, see the [docs/](docs/
 
 ---
 
+## Research Blog
+
+For an interactive, paper-style presentation of BAHA's methodology and results:
+
+[![Research Blog](https://img.shields.io/badge/Read-Research%20Blog-green?style=for-the-badge)](https://v0-research-blog-website.vercel.app/)
+
+---
+
 ## Citation
 
-If you use BAHA in your research:
+If you use BAHA in your research, please cite:
+
+### Primary Citation
 
 ```bibtex
 @article{iyer2026multiplicative,
-  title={Multiplicative Calculus for Hardness Detection and Branch-Aware Optimization},
+  title={Multiplicative Calculus for Hardness Detection and Branch-Aware Optimization: 
+         A Computational Framework for Detecting Phase Transitions via Non-Integrable Log-Derivatives},
   author={Iyer, Sethurathienam},
+  journal={Zenodo},
   year={2026},
   doi={10.5281/zenodo.18373732}
 }
 ```
+
+### Related Work by Author
+
+| Title | Year | DOI |
+|-------|------|-----|
+| Spectral-Multiplicative Optimization Framework | 2025 | [10.5281/zenodo.17596089](https://doi.org/10.5281/zenodo.17596089) |
+| Solving SAT with Quantum Vacuum Dynamics | 2025 | [10.5281/zenodo.17394165](https://doi.org/10.5281/zenodo.17394165) |
+| ShunyaBar: Spectral–Arithmetic Phase Transitions for Combinatorial Optimization | 2025 | [10.5281/zenodo.18214172](https://doi.org/10.5281/zenodo.18214172) |
+
+### Foundational References
+
+BAHA builds on decades of research in statistical physics, optimization, and complexity theory:
+
+```bibtex
+@article{kirkpatrick1983optimization,
+  title={Optimization by Simulated Annealing},
+  author={Kirkpatrick, Scott and Gelatt, C Daniel and Vecchi, Mario P},
+  journal={Science},
+  volume={220},
+  number={4598},
+  pages={671--680},
+  year={1983},
+  doi={10.1126/science.220.4598.671}
+}
+
+@article{parisi1980order,
+  title={The Order Parameter for Spin Glasses: A Function on the Interval 0-1},
+  author={Parisi, Giorgio},
+  journal={Journal of Physics A: Mathematical and General},
+  volume={13},
+  number={3},
+  pages={1101},
+  year={1980},
+  doi={10.1088/0305-4470/13/3/042}
+}
+
+@article{mezard2002analytic,
+  title={Analytic and Algorithmic Solution of Random Satisfiability Problems},
+  author={M{\'e}zard, Marc and Parisi, Giorgio and Zecchina, Riccardo},
+  journal={Science},
+  volume={297},
+  number={5582},
+  pages={812--815},
+  year={2002},
+  doi={10.1126/science.1073287}
+}
+
+@article{selman1996generating,
+  title={Generating Hard Satisfiability Problems},
+  author={Selman, Bart and Mitchell, David G and Levesque, Hector J},
+  journal={Artificial Intelligence},
+  volume={81},
+  number={1-2},
+  pages={17--29},
+  year={1996},
+  doi={10.1016/0004-3702(95)00045-3}
+}
+
+@book{mezard2009information,
+  title={Information, Physics, and Computation},
+  author={M{\'e}zard, Marc and Montanari, Andrea},
+  year={2009},
+  publisher={Oxford University Press},
+  doi={10.1093/acprof:oso/9780198570837.001.0001}
+}
+
+@article{zdeborova2016statistical,
+  title={Statistical Physics of Inference: Thresholds and Algorithms},
+  author={Zdeborov{\'a}, Lenka and Krzakala, Florent},
+  journal={Advances in Physics},
+  volume={65},
+  number={5},
+  pages={453--552},
+  year={2016},
+  doi={10.1080/00018732.2016.1211393}
+}
+
+@article{corless1996lambertw,
+  title={On the Lambert W Function},
+  author={Corless, Robert M and Gonnet, Gaston H and Hare, David EG and Jeffrey, David J and Knuth, Donald E},
+  journal={Advances in Computational Mathematics},
+  volume={5},
+  number={1},
+  pages={329--359},
+  year={1996},
+  doi={10.1007/BF02124750}
+}
+
+@article{sherrington1975solvable,
+  title={Solvable Model of a Spin-Glass},
+  author={Sherrington, David and Kirkpatrick, Scott},
+  journal={Physical Review Letters},
+  volume={35},
+  number={26},
+  pages={1792},
+  year={1975},
+  doi={10.1103/PhysRevLett.35.1792}
+}
+
+@article{monasson1999determining,
+  title={Determining Computational Complexity from Characteristic 'Phase Transitions'},
+  author={Monasson, R{\'e}mi and Zecchina, Riccardo and Kirkpatrick, Scott and Selman, Bart and Troyansky, Lidror},
+  journal={Nature},
+  volume={400},
+  number={6740},
+  pages={133--137},
+  year={1999},
+  doi={10.1038/22055}
+}
+
+@article{achlioptas2008algorithmic,
+  title={Algorithmic Barriers from Phase Transitions},
+  author={Achlioptas, Dimitris and Coja-Oghlan, Amin},
+  journal={Proceedings of IEEE FOCS},
+  pages={793--802},
+  year={2008},
+  doi={10.1109/FOCS.2008.11}
+}
+```
+
+---
 
 ## Research Status & Roadmap
 
