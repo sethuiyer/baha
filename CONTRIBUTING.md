@@ -106,7 +106,7 @@ BAHA is particularly well-suited for **research contributions**. We're actively 
 
 ### The Commercial Context
 
-ShunyaBar has a commercial product, **[Navokoj](https://navokoj.shunyabar.foo)**, which uses **20+ techniques like BAHA's fracture-aware reasoning** to accelerate QSTATE SAT solving for industrial applications.
+ShunyaBar has a commercial product, **[Navokoj](https://navokoj.shunyabar.foo)**, which uses BAHA-style fracture detection plus **one core proprietary technique** that prevents optimizers from getting stuck in glassy landscapes.
 
 **Navokoj's track record:**
 - **92.57%** perfect solve rate on SAT Competition 2024 benchmark
@@ -115,7 +115,7 @@ ShunyaBar has a commercial product, **[Navokoj](https://navokoj.shunyabar.foo)**
 
 ### Why Open Source BAHA?
 
-BAHA represents the **generic, domain-agnostic hardness measurement framework** — one of Navokoj's 20+ techniques, isolated and open-sourced.
+BAHA represents the **generic, domain-agnostic hardness measurement framework** — the open foundation that Navokoj builds upon.
 
 We believe:
 1. **This deserves comprehensive ablation studies** — contributions of each component should be isolated and measured

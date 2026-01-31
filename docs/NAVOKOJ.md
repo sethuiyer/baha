@@ -1,6 +1,6 @@
 # Navokoj: Industrial-Grade Constraint Thermodynamics Engine
 
-> **BAHA is one technique. Navokoj has 20+.**
+> **BAHA is the open foundation. Navokoj has one more trick — the one that matters.**
 
 [![Navokoj](https://img.shields.io/badge/Try-Navokoj-blue?style=for-the-badge)](https://navokoj.shunyabar.foo)
 
@@ -8,7 +8,9 @@
 
 ## What is Navokoj?
 
-**Navokoj** is ShunyaBar Labs' commercial constraint satisfaction engine. It uses **20+ techniques** including BAHA-style fracture detection, QSTATE native encoding, and thermodynamic reasoning to achieve what traditional SAT solvers cannot:
+**Navokoj** is ShunyaBar Labs' commercial constraint satisfaction engine. It uses BAHA-style fracture detection, QSTATE native encoding, and **one core proprietary technique** that prevents optimizers from getting stuck in glassy landscapes.
+
+Without that technique, you hit the glass ceiling. With it, you get:
 
 - **Graceful degradation** — never just "UNSAT and bye"
 - **Anytime solutions** — always returns best-so-far
@@ -229,7 +231,7 @@ This document shares empirical benchmarks from January 2026.
 
 [![Navokoj](https://img.shields.io/badge/Try-Navokoj-blue?style=for-the-badge)](https://navokoj.shunyabar.foo)
 
-**BAHA** (this repo) is the open-source foundation — one of 20+ techniques that power Navokoj.
+**BAHA** (this repo) is the open-source foundation. Navokoj adds one more technique — the one that breaks through glassy landscapes.
 
 ---
 

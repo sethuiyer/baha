@@ -191,7 +191,7 @@ BAHA shows strong empirical results, but **rigorous validation is ongoing**:
 
 **BAHA is open-sourced by [ShunyaBar Labs](https://shunyabar.foo) for a reason.**
 
-ShunyaBar has a commercial product, **[Navokoj](https://navokoj.shunyabar.foo)**, which uses **20+ techniques** (including BAHA-style fracture detection) to achieve:
+ShunyaBar has a commercial product, **[Navokoj](https://navokoj.shunyabar.foo)**, which uses BAHA-style fracture detection plus **one core proprietary technique** that prevents optimizers from getting stuck in glassy landscapes. The results:
 
 - **92.57%** perfect solve rate on SAT Competition 2024
 - **AI Escargot** (hardest Sudoku) in **9 seconds**
