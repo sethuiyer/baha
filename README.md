@@ -160,9 +160,61 @@ If you use BAHA in your research:
 }
 ```
 
+## Research Status & Roadmap
+
+BAHA shows strong empirical results, but **rigorous validation is ongoing**:
+
+### What's Needed
+
+| Area | Status | Goal |
+|------|--------|------|
+| **Peer Review** | 🔄 In Progress | Academic publication with formal proofs |
+| **Modern Solver Comparison** | 🔜 Planned | Head-to-head vs Gurobi, OR-Tools, state-of-art SAT solvers |
+| **Scale Testing** | 🔜 Planned | N=1000+ spins, 10K+ variables |
+| **Ablation Studies** | 🔜 Community | Isolate contributions of fracture detection vs Lambert-W jumping |
+
+### Current Claims (Defensible)
+
+- ✅ Detects phase transitions via log-derivative of partition function
+- ✅ Outperforms simulated annealing on tested instances
+- ✅ Novel branch enumeration via Lambert-W function
+
+### Claims That Need Validation
+
+- ⏳ Performance vs commercial solvers (Gurobi, CPLEX)
+- ⏳ Scaling behavior on industrial-size problems
+- ⏳ Theoretical complexity bounds beyond empirical observation
+
+---
+
+## Why Open Source?
+
+**BAHA is open-sourced by [ShunyaBar Labs](https://shunyabar.foo) for a reason.**
+
+ShunyaBar has a commercial product, **[Navokoj](https://navokoj.shunyabar.foo)**, which uses similar fracture-aware reasoning to accelerate **QSTATE SAT solving** for specific industrial applications.
+
+BAHA represents the **generic, domain-agnostic hardness measurement framework** underlying that work. We believe:
+
+1. **This deserves comprehensive ablation studies** — isolating contributions of each component (fracture detection, Lambert-W branching, adaptive scheduling)
+2. **This cannot be done in isolation** — the research community needs access to reproduce, challenge, and extend these ideas
+3. **Open science accelerates progress** — if the core insight is real, it should survive scrutiny and benefit everyone
+
+We invite researchers to:
+- **Benchmark** against your favorite solvers
+- **Break** the claims with counterexamples
+- **Extend** to new problem domains
+- **Publish** findings (positive or negative)
+
+The best validation is adversarial. If BAHA holds up, great. If it doesn't, we all learn something.
+
+---
+
 ## License
 
 Apache License 2.0 - see [LICENSE](LICENSE).
 
+---
 
-Made with <3 at ShunyaBar Labs - https://shunyabar.foo/
+<p align="center">
+  Made with ❤️ at <a href="https://shunyabar.foo">ShunyaBar Labs</a>
+</p>
