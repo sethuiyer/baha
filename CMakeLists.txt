@@ -120,6 +120,31 @@ if(BUILD_EXAMPLES)
   add_executable(incident_response examples/incident_response.cpp)
   target_link_libraries(incident_response baha)
   set_property(TARGET incident_response PROPERTY CXX_STANDARD 17)
+
+  # Smart grid load shedding example
+  add_executable(smart_grid_load_shedding examples/smart_grid_load_shedding.cpp)
+  target_link_libraries(smart_grid_load_shedding baha)
+  set_property(TARGET smart_grid_load_shedding PROPERTY CXX_STANDARD 17)
+
+  # Adafactor meta-scheduler proof of concept
+  add_executable(adafactor_meta_scheduler examples/adafactor_meta_scheduler.cpp)
+  target_link_libraries(adafactor_meta_scheduler baha)
+  set_property(TARGET adafactor_meta_scheduler PROPERTY CXX_STANDARD 17)
+
+  # Adafactor spin glass (NP-hard fracture-aware optimization)
+  add_executable(adafactor_spin_glass examples/adafactor_spin_glass.cpp)
+  target_link_libraries(adafactor_spin_glass baha)
+  set_property(TARGET adafactor_spin_glass PROPERTY CXX_STANDARD 17)
+
+  # Full BAHA spin glass (discrete sampling + branch jumping)
+  add_executable(baha_spin_glass examples/baha_spin_glass.cpp)
+  target_link_libraries(baha_spin_glass baha)
+  set_property(TARGET baha_spin_glass PROPERTY CXX_STANDARD 17)
+
+  # Adaptive spin glass (auto-switching optimizer)
+  add_executable(adaptive_spin_glass examples/adaptive_spin_glass.cpp)
+  target_link_libraries(adaptive_spin_glass baha)
+  set_property(TARGET adaptive_spin_glass PROPERTY CXX_STANDARD 17)
 endif()
 
 # Benchmarks
@@ -163,6 +188,11 @@ if(BUILD_BENCHMARKS)
   add_executable(milp_benchmark benchmarks/milp_benchmark.cpp)
   target_link_libraries(milp_benchmark baha)
   set_property(TARGET milp_benchmark PROPERTY CXX_STANDARD 17)
+
+  # Spin Glass Comparison Benchmark
+  add_executable(spin_glass_comparison benchmarks/spin_glass_comparison.cpp)
+  target_link_libraries(spin_glass_comparison baha)
+  set_property(TARGET spin_glass_comparison PROPERTY CXX_STANDARD 17)
 
   # Unified Ramsey solver (CPU/CUDA/MPS)
   set(RAMSEY_UNIFIED_SOURCES
@@ -243,6 +273,11 @@ if(BUILD_TESTS)
   add_executable(cross_platform_test tests/cross_platform_test.cpp)
   target_link_libraries(cross_platform_test baha)
   set_property(TARGET cross_platform_test PROPERTY CXX_STANDARD 17)
+
+  # Adafactor meta-scheduler test
+  add_executable(adafactor_meta_scheduler_test tests/adafactor_meta_scheduler_test.cpp)
+  target_link_libraries(adafactor_meta_scheduler_test baha)
+  set_property(TARGET adafactor_meta_scheduler_test PROPERTY CXX_STANDARD 17)
 
   if(HAVE_CUDA)
     target_compile_definitions(cross_platform_test PRIVATE BAHA_HAVE_CUDA_BACKEND=1)
