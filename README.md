@@ -191,7 +191,14 @@ BAHA shows strong empirical results, but **rigorous validation is ongoing**:
 
 **BAHA is open-sourced by [ShunyaBar Labs](https://shunyabar.foo) for a reason.**
 
-ShunyaBar has a commercial product, **[Navokoj](https://navokoj.shunyabar.foo)**, which uses similar fracture-aware reasoning to accelerate **QSTATE SAT solving** for specific industrial applications.
+ShunyaBar has a commercial product, **[Navokoj](https://navokoj.shunyabar.foo)**, which uses **20+ techniques** (including BAHA-style fracture detection) to achieve:
+
+- **92.57%** perfect solve rate on SAT Competition 2024
+- **AI Escargot** (hardest Sudoku) in **9 seconds**
+- **2.4M clauses** at 97.55% satisfaction
+- **PSPACE-complete** problems in <200ms
+
+See [docs/NAVOKOJ.md](docs/NAVOKOJ.md) for full benchmarks.
 
 BAHA represents the **generic, domain-agnostic hardness measurement framework** underlying that work. We believe:
 
