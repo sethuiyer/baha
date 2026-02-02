@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=45", "wheel", "pybind11>=2.10"]
+requires = ["setuptools>=64", "wheel", "pybind11>=2.10", "setuptools-scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -36,8 +36,12 @@ Repository = "https://github.com/sethuiyer/baha"
 Documentation = "https://github.com/sethuiyer/baha/tree/main/docs"
 
 [tool.setuptools]
-packages = []
-script-files = ["bindings/python/setup.py"]
+# For C++ extensions, we need to define the extension modules directly
+# This is handled by the setup.py in bindings/python, so we'll use that
+py-modules = ["pybaha"]  # This tells setuptools to look for pybaha module
 
 [tool.setuptools.package-data]
 "*" = ["*.hpp", "*.h", "*.cuh"]
+
+[tool.setuptools.cmdclass]
+build_ext = "pybind11.setup_helpers.build_ext"
