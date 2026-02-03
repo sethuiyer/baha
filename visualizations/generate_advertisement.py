@@ -881,6 +881,158 @@ class VideoGenerator:
 
             self.save_frame()
 
+    def scene_vrp(self, duration_sec=3):
+        """Scene 10: Vehicle Routing Problem"""
+        print("🚚 Rendering: Vehicle Routing Problem...")
+
+        frames = int(FPS * duration_sec)
+
+        # Setup VRP: Depot + 20 customers, 3 vehicles
+        n_customers = 20
+        n_vehicles = 3
+        depot = (WIDTH // 2, HEIGHT // 2)
+
+        # Customer locations
+        customers = [
+            (random.randint(200, WIDTH - 200), random.randint(150, HEIGHT - 150))
+            for _ in range(n_customers)
+        ]
+        demands = [random.randint(5, 20) for _ in range(n_customers)]
+        vehicle_capacity = 50
+
+        # Assignment: which vehicle serves which customer
+        state = [random.randint(0, n_vehicles - 1) for _ in range(n_customers)]
+
+        def route_distance(assignment):
+            """Calculate total distance for all routes"""
+            total_dist = 0
+
+            for v in range(n_vehicles):
+                # Get customers for this vehicle
+                vehicle_customers = [
+                    customers[i] for i, a in enumerate(assignment) if a == v
+                ]
+                vehicle_demand = sum(
+                    demands[i] for i, a in enumerate(assignment) if a == v
+                )
+
+                # Check capacity
+                if vehicle_demand > vehicle_capacity:
+                    total_dist += 10000  # Heavy penalty
+
+                # TSP-like route for this vehicle (simplified)
+                if vehicle_customers:
+                    # Nearest neighbor approximation
+                    route = [depot]
+                    unvisited = vehicle_customers.copy()
+
+                    while unvisited:
+                        last = route[-1]
+                        nearest = min(unvisited, key=lambda c: math.dist(last, c))
+                        total_dist += math.dist(last, nearest)
+                        route.append(nearest)
+                        unvisited.remove(nearest)
+
+                    # Return to depot
+                    total_dist += math.dist(route[-1], depot)
+
+            return total_dist
+
+        current = route_distance(state)
+        best = current
+        step = 0
+
+        vehicle_colors = [(255, 100, 100), (100, 255, 100), (100, 100, 255)]
+
+        for frame in range(frames):
+            self.screen.fill(BG_COLOR)
+
+            # Optimize
+            for _ in range(15):
+                idx = random.randint(0, n_customers - 1)
+                new = state.copy()
+                new[idx] = random.randint(0, n_vehicles - 1)
+                new_dist = route_distance(new)
+                if new_dist < current or random.random() < 0.2:
+                    state = new
+                    current = new_dist
+                    if current < best:
+                        best = current
+                step += 1
+
+            # Draw depot
+            pygame.draw.circle(self.screen, (255, 200, 100), depot, 25)
+            pygame.draw.circle(self.screen, (255, 255, 255), depot, 18)
+            depot_text = self.font_small.render("DEPOT", True, (0, 0, 0))
+            depot_rect = depot_text.get_rect(center=depot)
+            self.screen.blit(depot_text, depot_rect)
+
+            # Draw routes for each vehicle
+            for v in range(n_vehicles):
+                vehicle_customers = [
+                    (i, customers[i]) for i, a in enumerate(state) if a == v
+                ]
+                vehicle_demand = sum(demands[i] for i, a in enumerate(state) if a == v)
+
+                if vehicle_customers:
+                    # Draw route
+                    points = [depot]
+                    for idx, pos in vehicle_customers:
+                        points.append(pos)
+                    points.append(depot)
+
+                    # Draw lines with vehicle color
+                    for i in range(len(points) - 1):
+                        pygame.draw.line(
+                            self.screen, vehicle_colors[v], points[i], points[i + 1], 4
+                        )
+
+                    # Draw customers
+                    for idx, pos in vehicle_customers:
+                        color = vehicle_colors[v]
+                        pygame.draw.circle(self.screen, color, pos, 12)
+                        pygame.draw.circle(self.screen, (255, 255, 255), pos, 8)
+                        # Demand text
+                        d_text = self.font_small.render(
+                            str(demands[idx]), True, (0, 0, 0)
+                        )
+                        d_rect = d_text.get_rect(center=pos)
+                        self.screen.blit(d_text, d_rect)
+
+            # Capacity bars
+            bar_y = HEIGHT - 80
+            for v in range(n_vehicles):
+                load = sum(demands[i] for i, a in enumerate(state) if a == v)
+                bar_x = 300 + v * 400
+                bar_w = 200
+                bar_h = 25
+
+                # Background
+                pygame.draw.rect(
+                    self.screen, (50, 50, 70), (bar_x, bar_y, bar_w, bar_h)
+                )
+                # Fill
+                fill_w = (load / vehicle_capacity) * bar_w
+                color = vehicle_colors[v] if load <= vehicle_capacity else (255, 50, 50)
+                pygame.draw.rect(self.screen, color, (bar_x, bar_y, fill_w, bar_h))
+
+                # Label
+                label = self.font_small.render(
+                    f"Vehicle {v + 1}: {load}/{vehicle_capacity}",
+                    True,
+                    vehicle_colors[v],
+                )
+                self.screen.blit(label, (bar_x, bar_y - 25))
+
+            self.draw_stats_panel(
+                "Vehicle Routing", step, int(current / 100), int(best / 100), 100
+            )
+
+            title = self.font.render("Problem 10: Vehicle Routing", True, ACCENT2)
+            self.screen.blit(title, (50, 50))
+
+            self.save_frame()
+
     def scene_final(self, duration_sec=3):
         """Scene 10: Final showcase with all stats"""
         print("🏆 Rendering: Final showcase...")
@@ -897,13 +1049,14 @@ class VideoGenerator:
             ("Max Clique", "35 nodes", "✓ Clique found"),
             ("Bin Packing", "40 items, 8 bins", "✓ Packed optimally"),
             ("Max Independent Set", "40 nodes", "✓ Set isolated"),
+            ("Vehicle Routing", "20 customers, 3 vehicles", "✓ Routes optimized"),
         ]
 
         for frame in range(frames):
             self.screen.fill(BG_COLOR)
 
             # Title
-            title = self.font_large.render("BAHA: 9 Problems Conquered", True, ACCENT)
+            title = self.font_large.render("BAHA: 10 Problems Conquered", True, ACCENT)
             title_rect = title.get_rect(center=(WIDTH // 2, 100))
             self.screen.blit(title, title_rect)
 
@@ -978,6 +1131,7 @@ class VideoGenerator:
         self.scene_clique(duration_sec=2)
         self.scene_binpacking(duration_sec=2)
         self.scene_mis(duration_sec=2)
+        self.scene_vrp(duration_sec=3)
 
         # Final showcase
         self.scene_final(duration_sec=4)
