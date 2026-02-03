@@ -4,7 +4,7 @@
 
 # BAHA: Branch-Aware Holonomy Annealing
 
-> **Better than Simulated Annealing. Uses phase transitions (fractures) to escape local minima.**
+> **Simulated annealing which uses thermodynamics of the landscape to escape local minima.**
 
 [![Watch the Presentation](https://img.shields.io/badge/YouTube-Watch%20Presentation-red?style=for-the-badge&logo=youtube)](https://www.youtube.com/watch?v=jVKetFO7SgM)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18373732.svg)](https://doi.org/10.5281/zenodo.18373732)
