@@ -2227,11 +2227,202 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <div class="key-insight">
 <p>💡 <strong>The Central Insight:</strong> When a solution space “shatters” (exhibits a thermodynamic fracture), the system has multiple energetically-viable futures. Ordinary optimizers blindly follow one path; BAHA enumerates all thermodynamically valid branches and jumps to the most promising one.</p>
 </div>
-<p><strong>Audio:</strong> Teleporting Through Cracks in Mathematical Reality<br />
-<audio controls preload="none">
-<source src="Teleporting_Through_Cracks_in_Mathematical_Reality.mp3" type="audio/mpeg">
-Your browser does not support the audio element.
-</audio></p>
+<style>
+.audio-container {
+  max-width: 600px;
+  margin: 20px 0;
+  padding: 20px;
+  background: linear-gradient(145deg, #f0f0f0, #ffffff);
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  border: 1px solid #e0e0e0;
+  position: relative;
+  overflow: hidden;
+}
+
+.audio-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7);
+  background-size: 500% 500%;
+  animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.audio-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.audio-icon {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  color: white;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.audio-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #2d3436;
+  margin: 0;
+}
+
+.custom-audio-player {
+  width: 100%;
+  background: #f7f7f7;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.custom-audio-player audio {
+  width: 100%;
+  outline: none;
+}
+
+.audio-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  gap: 10px;
+}
+
+.playback-rate-btn {
+  background: #74b9ff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.playback-rate-btn:hover {
+  background: #0984e3;
+}
+
+.visualizer {
+  height: 30px;
+  background: #2d3436;
+  border-radius: 5px;
+  margin-top: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.visualizer-bar {
+  position: absolute;
+  bottom: 0;
+  width: 4px;
+  background: #00cec9;
+  border-radius: 2px 2px 0 0;
+  animation: visualizerAnimation 1.5s infinite ease-in-out;
+}
+
+@keyframes visualizerAnimation {
+  0%, 100% { height: 5px; }
+  50% { height: 25px; }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const audio = document.querySelector('.custom-audio-player audio');
+  if (!audio) return;
+
+  // Create visualizer bars
+  const visualizer = document.createElement('div');
+  visualizer.className = 'visualizer';
+
+  for (let i = 0; i < 50; i++) {
+    const bar = document.createElement('div');
+    bar.className = 'visualizer-bar';
+    bar.style.left = `${i * 6}px`;
+    bar.style.animationDelay = `${i * 0.05}s`;
+    bar.style.height = `${Math.random() * 20 + 5}px`;
+    visualizer.appendChild(bar);
+  }
+
+  // Add visualizer after the audio player
+  audio.parentNode.insertBefore(visualizer, audio.nextSibling);
+
+  // Add playback rate button
+  const controlsContainer = document.querySelector('.audio-controls');
+  if (controlsContainer) {
+    const rateBtn = document.createElement('button');
+    rateBtn.className = 'playback-rate-btn';
+    rateBtn.textContent = 'Speed: 1x';
+
+    let currentRate = 1;
+    const rates = [0.5, 0.75, 1, 1.25, 1.5, 2];
+    let rateIndex = 2; // Start at 1x
+
+    rateBtn.addEventListener('click', function() {
+      rateIndex = (rateIndex + 1) % rates.length;
+      currentRate = rates[rateIndex];
+      audio.playbackRate = currentRate;
+      rateBtn.textContent = `Speed: ${currentRate}x`;
+
+      // Add visual feedback
+      rateBtn.style.transform = 'scale(0.95)';
+      setTimeout(() => {
+        rateBtn.style.transform = 'scale(1)';
+      }, 100);
+    });
+
+    controlsContainer.appendChild(rateBtn);
+  }
+
+  // Add audio event listeners for visualizer activation
+  audio.addEventListener('play', function() {
+    const bars = document.querySelectorAll('.visualizer-bar');
+    bars.forEach(bar => {
+      bar.style.animationPlayState = 'running';
+    });
+  });
+
+  audio.addEventListener('pause', function() {
+    const bars = document.querySelectorAll('.visualizer-bar');
+    bars.forEach(bar => {
+      bar.style.animationPlayState = 'paused';
+    });
+  });
+});
+</script>
+
+<div class="audio-container">
+  <div class="audio-header">
+    <div class="audio-icon">♪</div>
+    <h3 class="audio-title">Teleporting Through Cracks in Mathematical Reality</h3>
+  </div>
+  <div class="custom-audio-player">
+    <audio controls preload="none">
+      <source src="Teleporting_Through_Cracks_in_Mathematical_Reality.mp3" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+  </div>
+  <div class="audio-controls">
+  </div>
+</div>
 <hr />
 <h1 id="introduction">Introduction</h1>
 <p>Consider optimizing a 1000-variable random 3-SAT formula near the satisfiability threshold (<span class="math inline">\(\alpha \approx 4.26\)</span> clauses per variable). Standard simulated annealing (SA) succeeds ~70% of the time within reasonable budgets. What happens during the 30% failure cases?</p>
