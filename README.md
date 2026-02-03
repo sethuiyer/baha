@@ -107,51 +107,16 @@ BAHA isn't just theory. **22/26 (84%) pass rate** across diverse optimization do
 | 25 | Side-Channel (16-bit) | ≤1 | **0.3** | ✅ |
 | 26 | Ramsey R(3,3) @ N=5 | 0 | **0** | ✅ |
 
-**Highlights:**
-- **Ramsey R(5,5,5) @ N=52**: Solved 2.6M constraints. [Verifiable Witness](data/ramsey_52_witness.csv)
-- **Graph Isomorphism**: 100% success vs 20% for SA (N=50)
-- **All constraint satisfaction** (N-Queens, SAT, Sudoku, Magic Square): Perfect
-
----
-
-## Installation
-
-### Python
-```bash
-python3 bindings/python/setup.py install --user
-```
-
-### C++ (Header-Only)
-```bash
-mkdir build && cd build && cmake .. && make -j
-```
-
----
-
 ## Documentation
 
 
 For deep technical details, theory, and C++ API reference, see the [docs/](docs/) folder.
 
-### Documentation Index
-
-| File | Category | Content Summary | Target |
-| :--- | :--- | :--- | :--- |
-| **[README.md](README.md)** | Landing | **Main Entry Point**. Overview, installation, quickstart. | Everyone |
-| **[QUICKSTART.md](docs/guides/QUICKSTART.md)** | Guide | **10-Minute Guide**. Python vs CLI usage, zero-code examples. | New Users |
-| **[TUTORIAL.md](docs/guides/TUTORIAL.md)** | Tutorial | **Python Tutorial**. Step-by-step code for N-Queens, TSP. | Developers |
-| **[complexity.md](docs/technical/complexity.md)** | Technical | **Algorithmic Analysis**. Big-O complexity ($O(B \cdot N \cdot S)$). | Researchers |
-| **[CASE_STUDY.md](docs/technical/CASE_STUDY.md)** | Technical | **Deep Dive**. Detailed results for 26+ domains. | Researchers |
-| **[PROBLEM_LIST.md](docs/technical/PROBLEM_LIST.md)** | Technical | **Catalog**. List of 26 tested problems w/ fracture types. | Researchers |
-| **[OPTIMIZATION_GUIDE.md](docs/technical/OPTIMIZATION_GUIDE.md)** | Technical | **Performance**. Low-level C++/CUDA optimizations. | Contributors |
-
----
-
 ## Research Blog
 
 For an interactive, paper-style presentation of BAHA's methodology and results:
 
-[![Research Blog](https://img.shields.io/badge/Read-Research%20Blog-green?style=for-the-badge)](https://v0-research-blog-website.vercel.app/)
+[![Research Blog](https://img.shields.io/badge/Read-Research%20Blog-green?style=for-the-badge)](https://sethuiyer.github.io/baha/)
 
 ---
 
@@ -290,64 +255,6 @@ BAHA builds on decades of research in statistical physics, optimization, and com
   doi={10.1109/FOCS.2008.11}
 }
 ```
-
----
-
-## Research Status & Roadmap
-
-BAHA shows strong empirical results, but **rigorous validation is ongoing**:
-
-### What's Needed
-
-| Area | Status | Goal |
-|------|--------|------|
-| **Peer Review** | 🔄 In Progress | Academic publication with formal proofs |
-| **Modern Solver Comparison** | 🔜 Planned | Head-to-head vs Gurobi, OR-Tools, state-of-art SAT solvers |
-| **Scale Testing** | 🔜 Planned | N=1000+ spins, 10K+ variables |
-| **Ablation Studies** | 🔜 Community | Isolate contributions of fracture detection vs Lambert-W jumping |
-
-### Current Claims (Defensible)
-
-- ✅ Detects phase transitions via log-derivative of partition function
-- ✅ Outperforms simulated annealing on tested instances
-- ✅ Novel branch enumeration via Lambert-W function
-
-### Claims That Need Validation
-
-- ⏳ Performance vs commercial solvers (Gurobi, CPLEX)
-- ⏳ Scaling behavior on industrial-size problems
-- ⏳ Theoretical complexity bounds beyond empirical observation
-
----
-
-## Why Open Source?
-
-**BAHA is open-sourced by [ShunyaBar Labs](https://shunyabar.foo) for a reason.**
-
-ShunyaBar has a commercial product, **[Navokoj](https://navokoj.shunyabar.foo)**, which uses BAHA-style fracture detection plus **one core proprietary technique** that prevents optimizers from getting stuck in glassy landscapes. The results:
-
-- **92.57%** perfect solve rate on SAT Competition 2024
-- **AI Escargot** (hardest Sudoku) in **9 seconds**
-- **2.4M clauses** at 97.55% satisfaction
-- **PSPACE-complete** problems in <200ms
-
-See [docs/NAVOKOJ.md](docs/NAVOKOJ.md) for full benchmarks.
-
-BAHA represents the **generic, domain-agnostic hardness measurement framework** underlying that work. We believe:
-
-1. **This deserves comprehensive ablation studies** — isolating contributions of each component (fracture detection, Lambert-W branching, adaptive scheduling)
-2. **This cannot be done in isolation** — the research community needs access to reproduce, challenge, and extend these ideas
-3. **Open science accelerates progress** — if the core insight is real, it should survive scrutiny and benefit everyone
-
-We invite researchers to:
-- **Benchmark** against your favorite solvers
-- **Break** the claims with counterexamples
-- **Extend** to new problem domains
-- **Publish** findings (positive or negative)
-
-The best validation is adversarial. If BAHA holds up, great. If it doesn't, we all learn something.
-
----
 
 ## License
 
