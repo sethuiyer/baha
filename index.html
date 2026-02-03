@@ -3063,9 +3063,9 @@ Show code
 </div>
 </details>
 <div class="figure"><span style="display:block;" id="fig:fig-nqueens-scaling"></span>
-<img src="baha_distill_files/figure-html5/fig-nqueens-scaling-1.png" alt="**N-Queens scaling behavior.** Real experimental results showing BAHA solving N-Queens for increasing board sizes. Time increases with problem size, but solution quality remains high. All runs except N=100 achieved perfect solutions (E=0). (Data from `baha/benchmarks/detailed_experiment.py`.)" width="768" />
+<img src="baha_distill_files/figure-html5/fig-nqueens-scaling-1.png" alt="**N-Queens scaling behavior.** Real experimental results showing BAHA solving N-Queens for increasing board sizes. Time increases with problem size, but solution quality remains high. All runs except N=100 achieved valid solutions (E=0). (Data from `baha/benchmarks/detailed_experiment.py`.)" width="768" />
 <p class="caption">
-Figure 6: <strong>N-Queens scaling behavior.</strong> Real experimental results showing BAHA solving N-Queens for increasing board sizes. Time increases with problem size, but solution quality remains high. All runs except N=100 achieved perfect solutions (E=0). (Data from <code>baha/benchmarks/detailed_experiment.py</code>.)
+Figure 6: <strong>N-Queens scaling behavior.</strong> Real experimental results showing BAHA solving N-Queens for increasing board sizes. Time increases with problem size, but solution quality remains high. All runs except N=100 achieved valid solutions (E=0). (Data from <code>baha/benchmarks/detailed_experiment.py</code>.)
 </p>
 </div>
 </div>
@@ -3284,7 +3284,7 @@ Figure 9: <strong>TSP branch jump visualization.</strong> (A) Energy trajectory 
 </p>
 </div>
 </div>
-<p>The jump at <span class="math inline">\(\beta = 1.2\)</span> corresponds to a <strong>tour re-routing</strong> that changes the connectivity structure. This is a topological reorganization impossible to discover via sequential 2-opt moves—they would need to temporarily <em>increase</em> tour length by ~15%, which becomes exponentially unlikely as <span class="math inline">\(\beta\)</span> increases.</p>
+<p>The jump at <span class="math inline">\(\beta = 1.2\)</span> corresponds to a <strong>tour re-routing</strong> that changes the connectivity structure. This is a topological reorganization extremely difficult to discover via sequential 2-opt moves—they would need to temporarily <em>increase</em> tour length by ~15%, which becomes exponentially unlikely as <span class="math inline">\(\beta\)</span> increases.</p>
 <h2 id="ablation-studies">Ablation Studies</h2>
 <div class="layout-chunk" data-layout="l-body">
 <details>
@@ -3526,7 +3526,7 @@ F(N) \approx a N^\kappa, \quad \kappa \in [0.2, 0.5]
 </tr>
 </tbody>
 </table>
-<p>The 199 fractures correspond to containment/outage tipping points—moments where adding one more containment action would cause cascading service disruption. BAHA found the optimal balance: rotate keys, block SMB, enforce MFA, block C2 domains, deploy EDR, disable lateral movement—while correctly <em>avoiding</em> full tier isolation for medium-severity events.</p>
+<p>The 199 fractures correspond to containment/outage tipping points—moments where adding one more containment action would cause cascading service disruption. BAHA found an effective balance: rotate keys, block SMB, enforce MFA, block C2 domains, deploy EDR, disable lateral movement—while correctly <em>avoiding</em> full tier isolation for medium-severity events.</p>
 <p><strong>Novel contribution:</strong> First application of fracture-aware optimization to cyber incident response.</p>
 <h2 id="smart-grid-load-shedding">Smart Grid Load Shedding</h2>
 <p><strong>Problem:</strong> Stabilize an electrical grid during supply shortfall by selecting loads to shed while protecting critical infrastructure.</p>
@@ -4079,7 +4079,7 @@ P(\text{branch viable}) \approx \bar{w}_k = \frac{1}{M}\sum_{i=1}^M e^{-\beta_k 
 \]</span></p>
 <p>The reciprocal form ensures:
 - Low <span class="math inline">\(E_{\min}\)</span> yields high score (promising branch)
-- The <span class="math inline">\(+1\)</span> prevents division by zero when <span class="math inline">\(E_{\min} = 0\)</span> (perfect solution found)
+- The <span class="math inline">\(+1\)</span> prevents division by zero when <span class="math inline">\(E_{\min} = 0\)</span> (optimal solution found)
 - The constant <span class="math inline">\(C = 100\)</span> (default) calibrates the exploitation/exploration trade-off</p>
 <p><strong>Final Score:</strong></p>
 <p><span class="math display">\[

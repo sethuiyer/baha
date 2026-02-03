@@ -85,7 +85,7 @@ BAHA introduces **hardness observability** to optimization:
 
 **Core Innovation:**
 - **Fracture Detection:** Monitors the derivative ρ = |d/dβ log Z| to detect phase transitions
-- **Lambert-W Branch Enumeration:** Mathematically identifies all solution branches at a fracture point
+- **Lambert-W Branch Enumeration:** Mathematically identifies alternative solution branches at a fracture point
 - **Intelligent Jumping:** Skips slow annealing by jumping directly to the most promising branch
 
 **Delivery Model:**

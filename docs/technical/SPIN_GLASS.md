@@ -87,10 +87,10 @@ BAHA found 4169.4% better solution!
 
 1. **Fracture detected** at β=0.03 (very early)
 2. **Lambert-W enumerated branches** and scored them
-3. **Jumped to best branch** → immediately found E=-42.26
+3. **Jumped to best branch** → found E=-42.26 (significant improvement in one step)
 4. **Solved in 2 steps** instead of 500
 
-This is the real BAHA: **teleportation instead of walking**.
+This demonstrates BAHA's strength: **rapid basin transitions instead of gradual local search**.
 
 ---
 
@@ -242,7 +242,7 @@ That's exactly what a **true spin glass ground state** looks like.
 
 ### 3. Branch Jumping Works
 
-BranchAware detected **1 fracture** and performed **1 jump** — and immediately found the solution. This is the Lambert-W branch enumeration in action.
+BranchAware detected **1 fracture** and performed **1 jump** — achieving rapid convergence to a high-quality solution. This is the Lambert-W branch enumeration in action.
 
 ---
 

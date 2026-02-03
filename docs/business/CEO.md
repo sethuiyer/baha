@@ -17,7 +17,7 @@ BAHA is no longer a technical library; it is the **Strategic Choice** for indust
 
 ### 3. Smart Grid & Energy Balancing ($100B+ Market)
 *   **The Opportunity**: Renewable-heavy grids "shatter" when transmission nodes hit capacity.
-*   **The BAHA Play**: Real-time grid state "teleportation" to prevent congestion blackouts.
+*   **The BAHA Play**: Real-time grid state optimization with rapid topology transitions to prevent congestion blackouts.
 *   **KPI**: 30% increase in renewable integration capacity without transmission upgrades.
 
 ### 4. Generative Material Science ($8B Market)
@@ -34,9 +34,9 @@ BAHA is no longer a technical library; it is the **Strategic Choice** for indust
 | **Material Sci** | Generative Design| Structural Sheet Navigation| $8B |
 
 ## 🛡️ The Competitive Moat
-Our moat is **Topological Navigation**. While the rest of the market uses "Random Walks" (Simulated Annealing), BAHA uses the **Math of Space-Time** to jump between solutions. 
+Our moat is **Topological Navigation**. While the rest of the market uses "Random Walks" (Simulated Annealing), BAHA uses **fracture detection and branch enumeration** to navigate between solution basins.
 
-**We don't solve the problem; we solve the landscape.**
+**We don't claim to solve NP-hard problems; we exploit their structure more effectively.**
 
 ---
 *Sethurathienam Iyer*  

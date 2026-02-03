@@ -231,7 +231,7 @@ This document shares empirical benchmarks from January 2026.
 
 [![Navokoj](https://img.shields.io/badge/Try-Navokoj-blue?style=for-the-badge)](https://navokoj.shunyabar.foo)
 
-**BAHA** (this repo) is the open-source foundation. Navokoj adds one more technique — the one that breaks through glassy landscapes.
+**BAHA** (this repo) is the open-source foundation. Navokoj adds advanced techniques for navigating complex, glassy landscapes.
 
 ---
 

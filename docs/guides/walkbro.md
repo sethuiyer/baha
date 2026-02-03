@@ -37,7 +37,7 @@ Final Verdict
 BAHA is the "Fracture Hunter".
 
 It solves structured hardness (Partitioning/Chaos) orders of magnitude faster than SA.
-It reliably cracks "needle-in-haystack" problems (Graph Isomorphism) where SA fails.
+It reliably handles "needle-in-haystack" problems (Graph Isomorphism) where SA struggles.
 It solves dense hardness (5-SAT) noticeably better than SA.
 It outperforms continuous relaxations (Casimir) decisively.
 It scales massively on GPU, utilizing "Swarm Intelligence" to fold proteins in seconds.
@@ -75,11 +75,11 @@ The "Holy Grail" Result:
 
 Solve Time: 1.657 ms (Milliseconds!)
 Fracture Detection: One massive fracture ($\rho \approx 1.8 \times 10^7$) at $\beta=0.01$.
-Action: Immediate jump to the optimal basin.
+Action: Rapid transition to a high-quality solution basin.
 Outcome:
 Revenue: $645,995 (vs Random Baseline: $319,962). +102% Improvement.
 Feasibility: Only 1 constraint violation (vs 31 for random).
-Conclusion: BAHA transforms this NP-Hard resource allocation problem into a trivial task by identifying the structural "weakness" (fracture) in the landscape and exploiting it instantly.
+Conclusion: BAHA significantly improves solution quality on this NP-Hard resource allocation problem by identifying structural fractures in the landscape and exploiting them efficiently.
 
 9. The Time-Constraint Test (Job Shop Scheduling)
 We tested BAHA on the Job Shop Scheduling Problem (JSP) to see if it could handle critical-path dynamics.
@@ -99,7 +99,7 @@ Detection: 1,498 Fractures (Highly Constrained Landscape).
 Performance: Solved in 229 ms.
 Quality: 19/20 Vertices validly colored (0 edge conflicts).
 Improvement: 80% over random baseline.
-Insight: The high fracture count confirms that adding individual constraints creates a "minefield" of phase transitions. BAHA navigated this successfully with just a single branch jump to the optimal basin.
+Insight: The high fracture count confirms that adding individual constraints creates a complex landscape of phase transitions. BAHA navigated this successfully with selective branch jumps to better solution basins.
 11. The Physics Glass Test (LABS)
 We tackled the Low-Autocorrelation Binary Sequences (LABS) problem ($N=60$), a classic benchmark for "glassy" landscapes where SA notoriously stalls.
 
@@ -115,7 +115,7 @@ A. Exact Cover (Sudoku Variant)
 Result: Solved to Energy 0 (Perfect) in 0.69 ms.
 Fractures: 2 detected.
 Action: 2 Branch Jumps.
-Insight: BAHA identified the structural "locking" of the constraints and jumped between partial validity basins, solving it instantly.
+Insight: BAHA identified the structural "locking" of the constraints and navigated between partial validity basins, achieving rapid convergence.
 B. Planted Clique ($N=20, k=6$)
 Result: Energy -6 (Near Optimal).
 Time: 0.20 ms.
@@ -177,4 +177,4 @@ We solved the user's final challenge: **Number Partitioning at N=100,000**.
     -   **N=1,000:** Solved in **34 milliseconds**.
     -   **N=100,000:** Solved in **13.6 seconds**.
     -   **Energy Improvement:** Found a partition with residue $2 \times 10^8$ (vs random $3 \times 10^{14}$), a **$1.5 \times 10^6$ improvement**.
--   **Verdict:** **THE BARRIER IS BROKEN.** By replacing blind sampling with spectral analysis of the landscape's moments, BAHA achieves $O(N \log N)$ complexity on structured discrete problems, solving million-variable instances that are physically impossible for standard annealing.
+-   **Verdict:** **Spectral analysis provides a significant advantage.** By replacing blind sampling with spectral analysis of the landscape's moments, BAHA achieves $O(N \log N)$ complexity on structured discrete problems, efficiently solving million-variable instances that are computationally intractable for standard annealing.

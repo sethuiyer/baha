@@ -75,7 +75,7 @@ These are **different reasons** for the same signal to appear—evidence that fr
   <img src="../../data/energy_landscape.webp" alt="BAHA Energy Landscape" width="700"/>
 </p>
 
-**Core Concept:** Unlike Simulated Annealing which "walks" through the energy landscape, BAHA detects **fractures** (sharp discontinuities in log Z) and performs **Lambert-W branch jumps** to teleport between solution basins.
+**Core Concept:** Unlike Simulated Annealing which "walks" through the energy landscape, BAHA detects **fractures** (sharp discontinuities in log Z) and performs **Lambert-W branch jumps** to transition between disconnected solution basins.
 
 | Metric | Traditional SA | BAHA |
 |--------|---------------|------|
@@ -413,7 +413,7 @@ BC36: CGCTAGACTATC | GC=50% | MaxRun=1
 
 **Key Observation:** Fractures correspond to **route restructuring events** where the current assignment becomes infeasible or suboptimal. The 599 fractures indicate BAHA is detecting many local perturbations, but only 4 triggered meaningful basin transitions.
 
-**What This Proves:** Combinatorial + geometric problems exhibit detectable thermodynamic fractures corresponding to feasibility regime changes.
+**What This Demonstrates:** Combinatorial + geometric problems exhibit detectable thermodynamic signals corresponding to feasibility regime changes that BAHA can exploit.
 
 ---
 
@@ -473,7 +473,7 @@ BC36: CGCTAGACTATC | GC=50% | MaxRun=1
 
 **Key Observation:** The high fracture count (499) with low jump rate (0.4%) suggests many local conflict resolutions, but few correspond to basin transitions.
 
-**What This Proves:** Constraint satisfaction problems exhibit fractures corresponding to symmetry breaking and conflict resolution.
+**What This Demonstrates:** Constraint satisfaction problems exhibit thermodynamic signatures corresponding to symmetry breaking and conflict resolution that BAHA can detect.
 
 ---
 
@@ -699,7 +699,7 @@ Based on analysis across 26 problem types, fractures can be categorized by their
 The final test of the project was not just about solving a puzzle, but about verifying the physical correctness of the **Branch-Aware Optimizer** itself.
 
 ### Mechanism: Fracture-Directed Branch Sampling
-BAHA detects **fractures**—discontinuities in the specific heat—which signal that the optimizer is trapped in a sub-optimal basin. Upon detection, it uses the Lambert-W function to identify alternative branches and performs a **directed jump** (via independent sampling) to a new thermodynamic sheet. This allows it to "teleport" out of deep local minima instantly.
+BAHA detects **fractures**—discontinuities in the specific heat—which signal that the optimizer is trapped in a sub-optimal basin. Upon detection, it uses the Lambert-W function to identify alternative branches and performs a **directed jump** (via independent sampling) to a new thermodynamic sheet. This allows it to rapidly transition to a different solution basin, often achieving significant improvements in a single step.
 
 ### Results
 - **Configuration**: `beta` 0.01 -> 20.0, `fracture_threshold` = 2.0.
@@ -714,7 +714,7 @@ BAHA detects **fractures**—discontinuities in the specific heat—which signal
     ```
 - **Performance**: 
     - **CPU**: ~30 seconds.
-    - **CUDA**: **< 1 second**. The GPU parallelizes 2.6 million clique checks per step, allowing BAHA to liquefy the energy landscape almost instantly.
+    - **CUDA**: **< 1 second**. The GPU parallelizes 2.6 million clique checks per step, enabling rapid convergence through parallel exploration.
 
 ---
 
