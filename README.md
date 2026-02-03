@@ -27,6 +27,16 @@ Most optimizers get stuck in local minima because they treat the landscape as on
 
 ---
 
+## 🎬 Watch BAHA in Action
+
+30-second cinematic showcase of BAHA solving **10 NP-hard problems** in real-time:
+
+https://github.com/sethuiyer/baha/assets/baha_advertisement.mp4
+
+*Graph Coloring • N-Queens • 3-SAT • TSP • Knapsack • Number Partition • Max Clique • Bin Packing • Max Independent Set • Vehicle Routing*
+
+---
+
 ## Python-First Simplicity
 
 Get the raw speed of a C++17 engine with the usability of a Python script.
