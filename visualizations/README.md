@@ -86,6 +86,41 @@ python visualizations/sat3_500vars_visualizer.py
 - `R` - Reset
 - `Q` - Quit
 
+### 5. Advertisement Generator (`generate_advertisement.py`)
+
+**Create professional MP4 videos** showcasing BAHA solving 9 different problems. Perfect for:
+- Twitter/X posts
+- Conference presentations
+- GitHub README showcases
+- Demo reels
+
+```bash
+python visualizations/generate_advertisement.py
+# Generates: baha_advertisement.mp4 (30 seconds, 11MB)
+```
+
+**What it creates:**
+- **30 seconds, 1920×1080, 60 FPS**
+- **9 problem demonstrations** in sequence:
+  1. Graph Coloring (40 nodes)
+  2. N-Queens (50×50 board)
+  3. 3-SAT (300 vars, 1200 clauses)
+  4. TSP (30 cities)
+  5. Knapsack (50 items)
+  6. Number Partitioning (100 numbers)
+  7. Max Clique (35 nodes)
+  8. Bin Packing (40 items)
+  9. Max Independent Set (40 nodes)
+- **Professional title cards** and transitions
+- **Real-time stats overlay** (energy, progress, steps)
+- **No display required** - renders headlessly
+
+**Features:**
+- Uses actual pybaha for real optimization
+- Exports directly to MP4 using imageio
+- Clean dark theme with accent colors
+- Animated reveals and progress bars
+
 ## Architecture
 
 All visualizations use:
