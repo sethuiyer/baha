@@ -15,6 +15,7 @@
  * - Launch bounds for optimal occupancy
  */
 
+#include <climits>
 #include <cuda_runtime.h>
 #include <curand_kernel.h>
 
@@ -155,11 +156,13 @@ ramsey_baha_kernel_optimized(
     }
     __syncthreads();
     
-    // Cooperative state initialization
-    if (tid < words_per_state) {
-        const unsigned int rand_val = curand(&s_rng);
-        s_state[tid] = rand_val ^ (tid * 12345u);
-        s_best_state[tid] = s_state[tid];
+    // Cooperative state initialization (single RNG to avoid races)
+    if (tid == 0) {
+        for (int i = 0; i < words_per_state; ++i) {
+            const unsigned int rand_val = curand(&s_rng);
+            s_state[i] = rand_val ^ (static_cast<unsigned int>(i) * 12345u);
+            s_best_state[i] = s_state[i];
+        }
     }
     __syncthreads();
     
@@ -325,6 +328,12 @@ inline cudaError_t launch_ramsey_optimizer(
     int words_per_state,
     cudaStream_t stream = 0
 ) {
+    if (num_blocks <= 0) {
+        return cudaErrorInvalidValue;
+    }
+    if (words_per_state > 64 || words_per_state <= 0) {
+        return cudaErrorInvalidValue;
+    }
     // Calculate optimal grid size
     int device;
     cudaGetDevice(&device);

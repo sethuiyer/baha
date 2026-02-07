@@ -4,6 +4,8 @@
 #include <string>
 #include <random>
 #include <chrono>
+#include <cmath>
+#include <ctime>
 #include <cuda_runtime.h>
 #include <curand_kernel.h>
 #include <iomanip>
@@ -179,19 +181,25 @@ int main() {
     int threads_per_block = 256;
     int total_threads = num_blocks * threads_per_block;
     
-    int* d_sequence; cudaMalloc(&d_sequence, n * sizeof(int));
-    cudaMemcpy(d_sequence, h_sequence.data(), n * sizeof(int), cudaMemcpyHostToDevice);
+    int* d_sequence;
+    cudaCheckError(cudaMalloc(&d_sequence, n * sizeof(int)));
+    cudaCheckError(cudaMemcpy(d_sequence, h_sequence.data(), n * sizeof(int), cudaMemcpyHostToDevice));
     
-    curandState* d_states; cudaMalloc(&d_states, total_threads * sizeof(curandState));
+    curandState* d_states;
+    cudaCheckError(cudaMalloc(&d_states, total_threads * sizeof(curandState)));
     
-    int* d_pop_moves; cudaMalloc(&d_pop_moves, total_threads * MAX_N * sizeof(int));
-    int* d_pop_enes; cudaMalloc(&d_pop_enes, total_threads * sizeof(int));
+    int* d_pop_moves;
+    cudaCheckError(cudaMalloc(&d_pop_moves, total_threads * MAX_N * sizeof(int)));
+    int* d_pop_enes;
+    cudaCheckError(cudaMalloc(&d_pop_enes, total_threads * sizeof(int)));
     
-    int* d_best_moves; cudaMalloc(&d_best_moves, MAX_N * sizeof(int));
-    int* d_best_energy; cudaMalloc(&d_best_energy, sizeof(int));
+    int* d_best_moves;
+    cudaCheckError(cudaMalloc(&d_best_moves, MAX_N * sizeof(int)));
+    int* d_best_energy;
+    cudaCheckError(cudaMalloc(&d_best_energy, sizeof(int)));
     
     int h_init_best = 999999;
-    cudaMemcpy(d_best_energy, &h_init_best, sizeof(int), cudaMemcpyHostToDevice);
+    cudaCheckError(cudaMemcpy(d_best_energy, &h_init_best, sizeof(int), cudaMemcpyHostToDevice));
     
     // Log setup
     std::ofstream log("protein_log.csv");
@@ -220,10 +228,10 @@ int main() {
         
         // Read best
         int current_global_best_e;
-        cudaMemcpy(&current_global_best_e, d_best_energy, sizeof(int), cudaMemcpyDeviceToHost);
+        cudaCheckError(cudaMemcpy(&current_global_best_e, d_best_energy, sizeof(int), cudaMemcpyDeviceToHost));
         
         // Only verify moves if energy improved or periodically
-        cudaMemcpy(h_best_moves.data(), d_best_moves, (n-1)*sizeof(int), cudaMemcpyDeviceToHost);
+        cudaCheckError(cudaMemcpy(h_best_moves.data(), d_best_moves, (n-1)*sizeof(int), cudaMemcpyDeviceToHost));
         
         std::cout << "Frame " << frame << " (Beta=" << std::fixed << std::setprecision(2) << beta << "): Best E=" << current_global_best_e << "\r";
         std::cout.flush();
@@ -239,12 +247,12 @@ int main() {
     log.close();
     std::cout << "\nDone! Log saved to protein_log.csv\n";
     
-    cudaFree(d_sequence);
-    cudaFree(d_states);
-    cudaFree(d_pop_moves);
-    cudaFree(d_pop_enes);
-    cudaFree(d_best_moves);
-    cudaFree(d_best_energy);
+    cudaCheckError(cudaFree(d_sequence));
+    cudaCheckError(cudaFree(d_states));
+    cudaCheckError(cudaFree(d_pop_moves));
+    cudaCheckError(cudaFree(d_pop_enes));
+    cudaCheckError(cudaFree(d_best_moves));
+    cudaCheckError(cudaFree(d_best_energy));
     
     return 0;
 }
