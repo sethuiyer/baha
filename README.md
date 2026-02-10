@@ -27,16 +27,6 @@ Most optimizers get stuck in local minima because they treat the landscape as on
 
 ---
 
-## 🎬 Watch BAHA in Action
-
-30-second cinematic showcase of BAHA solving **10 NP-hard problems** in real-time:
-
-https://github.com/sethuiyer/baha/assets/baha_advertisement.mp4
-
-*Graph Coloring • N-Queens • 3-SAT • TSP • Knapsack • Number Partition • Max Clique • Bin Packing • Max Independent Set • Vehicle Routing*
-
----
-
 ## Python-First Simplicity
 
 Get the raw speed of a C++17 engine with the usability of a Python script.
@@ -60,28 +50,6 @@ result = pybaha.optimize(energy, random_sampler, neighbors)
 
 print(f"Result: {result.best_state}, Energy: {result.best_energy}")
 # ⚡ Fracture Density: 0.92 | Time: 345ms
-```
-
-### 🔮 ZetaOptimizer (High-Performance Hybrid)
-
-For problems with expensive energy functions, use `ZetaOptimizer` which oscillates between continuous relaxation and discrete MCMC polish:
-
-```python
-import pybaha
-
-# ZetaOptimizer requires encode/decode for continuous↔discrete conversion
-opt = pybaha.ZetaOptimizer(
-    discrete_energy, sampler, neighbors,
-    encode, decode, continuous_energy, continuous_gradient
-)
-
-config = pybaha.ZetaConfig()
-config.beta_min = 0.3      # Low beta for exploration
-config.beta_max = 2.0      # High beta for exploitation
-config.period = 500        # Oscillation period
-config.total_steps = 5000
-config.polish_steps = 50   # MCMC polish at each peak
-result = opt.optimize(config)
 ```
 
 ## Proven Results (26 Problem Domains)
