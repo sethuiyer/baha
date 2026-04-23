@@ -8,6 +8,7 @@
 
 [![Watch the Presentation](https://img.shields.io/badge/YouTube-Watch%20Presentation-red?style=for-the-badge&logo=youtube)](https://www.youtube.com/watch?v=jVKetFO7SgM)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18373732.svg)](https://doi.org/10.5281/zenodo.18373732)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsethuiyer%2Fbaha.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fsethuiyer%2Fbaha?ref=badge_shield)
 
 ---
 
@@ -266,3 +267,6 @@ Apache License 2.0 - see [LICENSE](LICENSE).
 <p align="center">
   Made with ❤️ at <a href="https://shunyabar.foo">ShunyaBar Labs</a>
 </p>
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsethuiyer%2Fbaha.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fsethuiyer%2Fbaha?ref=badge_large)
